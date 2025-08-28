@@ -1,7 +1,7 @@
 {
     "description": "Configuration weights for constraint satisfaction algorithm",
     "weights": {
-        "gender_balance": 1000,
+        "gender_balance": 1000000,
         "host_rotation": 100,
         "group_diversity": 50,
         "host_fairness": 25,
