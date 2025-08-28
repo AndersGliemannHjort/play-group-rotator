@@ -4,7 +4,11 @@
 
 A Python command-line tool that optimizes child group rotations using weighted constraint satisfaction algorithms. The system takes a tab-delimited file of exactly 24 children (12 boys, 12 girls) with their names and genders, then generates optimal group arrangements across multiple iterations (1-12) while balancing various constraints like gender balance, host rotation fairness, and meeting diversity.
 
-**Command Line Usage:** `python main.py <input_file.txt> <output_directory> <number_of_iterations>`
+**Command Line Usage:** `python main.py <number_of_iterations>`
+
+**File Structure:**
+- `input/` directory must contain exactly one tab-delimited file with 24 children
+- `output/` directory will be created automatically for output files
 
 **Output Files:**
 - `Play_groups_[count]_[YYYYMMDD_HHMMSS].txt` - Group arrangements with iteration separation

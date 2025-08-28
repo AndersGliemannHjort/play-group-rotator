@@ -3,7 +3,7 @@
 Child Group Rotation Optimizer
 A Python command-line tool for optimizing child group rotations using weighted constraint satisfaction.
 
-Usage: python main.py <input_file.txt> <output_directory> <number_of_iterations>
+Usage: python main.py <number_of_iterations>
 """
 
 import sys
@@ -15,24 +15,42 @@ from group_optimizer import GroupOptimizer
 from output_formatter import OutputFormatter
 
 
-def validate_arguments(args):
-    """Validate command line arguments."""
-    # Check if input file exists
-    if not os.path.exists(args.input_file):
-        print(f"Error: Input file '{args.input_file}' does not exist.")
+def validate_input_directory():
+    """Validate that input directory contains exactly one file."""
+    input_dir = "input"
+    
+    if not os.path.exists(input_dir):
+        print(f"Error: Input directory '{input_dir}' does not exist.")
         sys.exit(1)
     
-    # Check if output directory exists, create if not
-    if not os.path.exists(args.output_directory):
+    files = [f for f in os.listdir(input_dir) if os.path.isfile(os.path.join(input_dir, f))]
+    
+    if len(files) == 0:
+        print(f"Error: Input directory '{input_dir}' contains no files.")
+        sys.exit(1)
+    elif len(files) > 1:
+        print(f"Error: Input directory '{input_dir}' contains {len(files)} files. Expected exactly 1.")
+        sys.exit(1)
+    
+    return os.path.join(input_dir, files[0])
+
+def validate_output_directory():
+    """Validate and create output directory if needed."""
+    output_dir = "output"
+    
+    if not os.path.exists(output_dir):
         try:
-            os.makedirs(args.output_directory)
-            print(f"Created output directory: {args.output_directory}")
+            os.makedirs(output_dir)
+            print(f"Created output directory: {output_dir}")
         except OSError as e:
-            print(f"Error: Cannot create output directory '{args.output_directory}': {e}")
+            print(f"Error: Cannot create output directory '{output_dir}': {e}")
             sys.exit(1)
     
-    # Validate number of iterations
-    if args.number_of_iterations < 1 or args.number_of_iterations > 12:
+    return output_dir
+
+def validate_iterations(number_of_iterations):
+    """Validate number of iterations."""
+    if number_of_iterations < 1 or number_of_iterations > 12:
         print("Error: Number of iterations must be between 1 and 12.")
         sys.exit(1)
 
@@ -42,19 +60,19 @@ def main():
     parser = argparse.ArgumentParser(
         description="Optimize child group rotations using weighted constraint satisfaction"
     )
-    parser.add_argument("input_file", help="Tab-delimited file with child names and gender")
-    parser.add_argument("output_directory", help="Directory to save output files")
     parser.add_argument("number_of_iterations", type=int, help="Number of iterations (1-12)")
     
     args = parser.parse_args()
     
     # Validate arguments
-    validate_arguments(args)
+    validate_iterations(args.number_of_iterations)
+    input_file = validate_input_directory()
+    output_directory = validate_output_directory()
     
     try:
         # Initialize child manager and load children
         child_manager = ChildManager()
-        children = child_manager.load_children_from_file(args.input_file)
+        children = child_manager.load_children_from_file(input_file)
         
         # Validate children data
         child_manager.validate_children(children)
@@ -85,12 +103,12 @@ def main():
         
         # Generate group output file
         group_filename = f"Play_groups_{args.number_of_iterations}_{timestamp}.txt"
-        group_filepath = os.path.join(args.output_directory, group_filename)
+        group_filepath = os.path.join(output_directory, group_filename)
         formatter.write_groups_file(all_iterations, group_filepath)
         
         # Generate summary report
         summary_filename = f"Summary_{args.number_of_iterations}_{timestamp}.txt"
-        summary_filepath = os.path.join(args.output_directory, summary_filename)
+        summary_filepath = os.path.join(output_directory, summary_filename)
         formatter.write_summary_file(children, all_iterations, summary_filepath, optimizer.warnings)
         
         print(f"\nOutput files generated:")

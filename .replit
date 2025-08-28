@@ -21,9 +21,9 @@ args = "Child Group Optimizer"
 name = "Child Group Optimizer"
 author = "agent"
 
-[[workflows.workflow.tasks]]
-task = "shell.exec"
-args = "python main.py sample_children.txt output 3"
-
 [workflows.workflow.metadata]
 outputType = "console"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "python main.py 3"
