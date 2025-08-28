@@ -1,0 +1,40 @@
+=== ITERATION 1 ===
+Ava	Benjamin	Max	Petra
+Eleonora	Adam	Noah	Hannah
+Una	Oskar	Pelle	Elisa
+Freja	Tobias	Carl	Kaya Olivia
+Nora	Norman	Bille	Lou
+Luca	Emir	Emilie	Anna
+
+=== ITERATION 2 ===
+Oskar	Norman	Eleonora	Elisa
+Petra	Noah	Luca	Anna
+Carl	Max	Emilie	Nora
+Lou	Benjamin	Tobias	Ava
+Adam	Emir	Una	Freja
+Pelle	Bille	Hannah	Kaya Olivia
+
+=== ITERATION 3 ===
+Bille	Max	Lou	Freja
+Kaya Olivia	Pelle	Benjamin	Una
+Norman	Luca	Eleonora	Emilie
+Elisa	Carl	Oskar	Nora
+Anna	Noah	Emir	Petra
+Tobias	Adam	Hannah	Ava
+
+=== ITERATION 4 ===
+Hannah	Luca	Oskar	Elisa
+Noah	Bille	Una	Lou
+Max	Norman	Nora	Petra
+Benjamin	Adam	Anna	Freja
+Emir	Tobias	Ava	Kaya Olivia
+Emilie	Pelle	Carl	Eleonora
+
+=== ITERATION 5 ===
+Lou	Bille	Benjamin	Eleonora
+Freja	Adam	Luca	Nora
+Hannah	Pelle	Tobias	Kaya Olivia
+Anna	Oskar	Max	Una
+Ava	Noah	Carl	Petra
+Emir	Norman	Emilie	Elisa
+

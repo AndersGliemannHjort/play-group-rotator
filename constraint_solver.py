@@ -46,72 +46,115 @@ class ConstraintSolver:
         return best_solution
     
     def _generate_candidate_solution(self, boys, girls, iteration_num, previous_iterations):
-        """Generate a candidate solution using greedy assignment with randomization."""
+        """Generate a candidate solution using host-first construction."""
         from group_optimizer import Group
         
-        # Create copies to avoid modifying original lists
-        available_boys = boys.copy()
-        available_girls = girls.copy()
+        # Step 1: Select 6 hosts fairly based on hosting counts
+        all_children = boys + girls
+        hosts = self._select_hosts(all_children, 6)
+        
+        if len(hosts) != 6:
+            return None  # Failed to select hosts
+        
+        # Step 2: Build groups around each host
+        groups = []
+        remaining_children = [child for child in all_children if child not in hosts]
+        
+        for host in hosts:
+            # Build a group around this host
+            group = self._build_group_around_host(host, remaining_children)
+            if not group:
+                return None  # Failed to build valid group
+            
+            groups.append(group)
+            # Remove assigned children from remaining pool
+            for child in group.children[1:]:  # Skip host (first child)
+                if child in remaining_children:
+                    remaining_children.remove(child)
+        
+        return groups
+    
+    def _select_hosts(self, all_children, num_hosts):
+        """Select hosts fairly based on hosting counts."""
+        # Sort children by hosting count (ascending), then by name for consistency
+        candidates = sorted(all_children, key=lambda child: (child.hosting_count, child.name))
+        
+        # Find the minimum hosting count
+        min_hosting = candidates[0].hosting_count
+        
+        # Get all children with the minimum hosting count
+        min_hosting_children = [child for child in candidates if child.hosting_count == min_hosting]
+        
+        # If we have enough children with minimum hosting, select from them
+        if len(min_hosting_children) >= num_hosts:
+            random.shuffle(min_hosting_children)
+            return min_hosting_children[:num_hosts]
+        
+        # If not enough with minimum, take all min hosting children and select more
+        selected_hosts = min_hosting_children.copy()
+        remaining_needed = num_hosts - len(selected_hosts)
+        
+        # Get candidates with next lowest hosting count
+        next_hosting_candidates = [child for child in candidates 
+                                 if child.hosting_count == min_hosting + 1 
+                                 and child not in selected_hosts]
+        
+        if len(next_hosting_candidates) >= remaining_needed:
+            random.shuffle(next_hosting_candidates)
+            selected_hosts.extend(next_hosting_candidates[:remaining_needed])
+        else:
+            # Keep expanding until we have enough hosts
+            remaining_candidates = [child for child in candidates if child not in selected_hosts]
+            random.shuffle(remaining_candidates)
+            selected_hosts.extend(remaining_candidates[:remaining_needed])
+        
+        return selected_hosts
+    
+    def _build_group_around_host(self, host, available_children):
+        """Build a 2B+2G group around the given host."""
+        from group_optimizer import Group
+        
+        # Start with the host
+        group_children = [host]
+        
+        # Determine what we need based on host gender
+        if host.is_boy:
+            boys_needed = 1  # Already have 1 boy (host)
+            girls_needed = 2
+        else:
+            boys_needed = 2
+            girls_needed = 1  # Already have 1 girl (host)
+        
+        # Get available boys and girls
+        available_boys = [child for child in available_children if child.is_boy]
+        available_girls = [child for child in available_children if child.is_girl]
         
         # Shuffle for randomization
         random.shuffle(available_boys)
         random.shuffle(available_girls)
         
-        groups = []
+        # Add boys
+        for _ in range(min(boys_needed, len(available_boys))):
+            group_children.append(available_boys.pop(0))
         
-        for group_num in range(6):
-            group_children = []
-            
-            # Try to assign 2 boys and 2 girls to each group
-            boys_needed = 2
-            girls_needed = 2
-            
-            # Adjust if we don't have enough of one gender
-            remaining_boys = len(available_boys)
-            remaining_girls = len(available_girls)
-            remaining_groups = 6 - group_num
-            
-            if remaining_boys < boys_needed * remaining_groups:
-                boys_needed = max(0, remaining_boys - (remaining_groups - 1))
-            if remaining_girls < girls_needed * remaining_groups:
-                girls_needed = max(0, remaining_girls - (remaining_groups - 1))
-            
-            # Ensure we have exactly 4 children per group
-            total_needed = 4
-            if boys_needed + girls_needed > total_needed:
-                if boys_needed > girls_needed:
-                    boys_needed = total_needed - girls_needed
-                else:
-                    girls_needed = total_needed - boys_needed
-            elif boys_needed + girls_needed < total_needed:
-                shortage = total_needed - boys_needed - girls_needed
-                if remaining_boys > boys_needed:
-                    boys_needed += shortage
-                elif remaining_girls > girls_needed:
-                    girls_needed += shortage
-            
-            # Assign boys
-            for _ in range(min(boys_needed, len(available_boys))):
+        # Add girls
+        for _ in range(min(girls_needed, len(available_girls))):
+            group_children.append(available_girls.pop(0))
+        
+        # Fill remaining spots if needed (should not happen with 12B+12G)
+        while len(group_children) < 4:
+            if available_boys:
                 group_children.append(available_boys.pop(0))
-            
-            # Assign girls
-            for _ in range(min(girls_needed, len(available_girls))):
+            elif available_girls:
                 group_children.append(available_girls.pop(0))
-            
-            # If we still need more children, assign from remaining
-            while len(group_children) < 4 and (available_boys or available_girls):
-                if available_boys:
-                    group_children.append(available_boys.pop(0))
-                elif available_girls:
-                    group_children.append(available_girls.pop(0))
-            
-            if len(group_children) != 4:
-                return None  # Invalid solution
-            
-            # Assign host (first child in group)
-            groups.append(Group(group_children))
+            else:
+                break  # No more children available
         
-        return groups
+        # Verify we have exactly 4 children
+        if len(group_children) != 4:
+            return None
+        
+        return Group(group_children)
     
     def _evaluate_solution(self, groups, iteration_num, previous_iterations):
         """Evaluate the quality of a solution using weighted scoring."""
