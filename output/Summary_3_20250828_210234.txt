@@ -1,0 +1,128 @@
+CHILD GROUP ROTATION SUMMARY REPORT
+==================================================
+
+Generated: 2025-08-28 21:02:34
+Total Iterations: 3
+Total Children: 24
+
+HOSTING COUNTS
+--------------------
+Frank                  3 times
+Bob                    2 times
+David                  2 times
+Victor                 2 times
+Zoe                    2 times
+Henry                  1 times
+Jack                   1 times
+Liam                   1 times
+Noah                   1 times
+Paul                   1 times
+Ryan                   1 times
+Tom                    1 times
+Alice                  0 times
+Carol                  0 times
+Emma                   0 times
+Grace                  0 times
+Ivy                    0 times
+Kate                   0 times
+Mia                    0 times
+Olivia                 0 times
+Quinn                  0 times
+Sophia                 0 times
+Uma                    0 times
+Wendy                  0 times
+
+Hosting Statistics:
+  Min: 0, Max: 3, Avg: 0.8
+
+MEETING MATRIX
+--------------------
+Shows how many times each pair of children have been in the same group:
+
+Child             Alice     Bob   Carol   David    Emma   Frank   Grace   Henry     Ivy    Jack    Kate    Liam     Mia    Noah  Olivia    Paul   Quinn    Ryan  Sophia     Tom     Uma  Victor   Wendy     Zoe
+Alice                 -       1       0       0       0       0       0       0       1       1       0       0       0       0       1       0       1       0       0       1       0       1       0       0
+Bob                   1       -       0       0       0       0       0       0       1       0       0       1       0       0       0       0       1       0       1       1       0       1       1       0
+Carol                 0       0       -       0       0       1       0       1       0       0       0       0       0       1       0       1       0       1       1       0       1       0       1       0
+David                 0       0       0       -       1       0       0       1       0       0       0       0       1       1       1       1       1       0       0       0       1       0       0       0
+Emma                  0       0       0       1       -       0       0       1       0       1       1       0       1       0       0       1       0       0       0       0       1       1       0       0
+Frank                 0       0       1       0       0       -       0       1       1       0       0       0       1       0       1       0       1       0       1       1       0       0       0       1
+Grace                 0       0       0       0       0       0       -       0       0       0       1       0       1       1       0       1       0       1       0       1       0       0       0       1
+Henry                 0       0       1       1       1       1       0       -       0       0       0       0       0       1       0       0       0       0       1       0       1       0       0       0
+Ivy                   1       1       0       0       0       1       0       0       -       1       0       1       0       0       0       0       1       0       1       1       0       0       0       1
+Jack                  1       0       0       0       1       0       0       0       1       -       1       1       0       0       1       0       0       0       1       0       0       1       0       0
+Kate                  0       0       0       0       1       0       1       0       0       1       -       0       0       1       0       0       0       1       0       1       0       1       0       1
+Liam                  0       1       0       0       0       0       0       0       1       1       0       -       0       0       0       0       0       0       1       0       1       0       1       1
+Mia                   0       0       0       1       1       1       1       0       0       0       0       0       -       0       1       1       0       1       0       1       0       0       0       0
+Noah                  0       0       1       1       0       0       1       1       0       0       1       0       0       -       1       0       1       0       0       0       1       0       0       1
+Olivia                1       0       0       1       0       1       0       0       0       1       0       0       1       1       -       0       1       0       0       1       0       1       0       0
+Paul                  0       0       1       1       1       0       1       0       0       0       0       0       1       0       0       -       0       1       0       0       0       0       1       0
+Quinn                 1       1       0       1       0       1       0       0       1       0       0       0       0       1       1       0       -       0       0       0       0       1       0       1
+Ryan                  0       0       1       0       0       0       1       0       0       0       1       0       1       0       0       1       0       -       0       1       0       0       1       0
+Sophia                0       1       1       0       0       1       0       1       1       1       0       1       0       0       0       0       0       0       -       0       0       0       1       0
+Tom                   1       1       0       0       0       1       1       0       1       0       1       0       1       0       1       0       0       1       0       -       0       0       0       0
+Uma                   0       0       1       1       1       0       0       1       0       0       0       1       0       1       0       0       0       0       0       0       -       0       1       1
+Victor                1       1       0       0       1       0       0       0       0       1       1       0       0       0       1       0       1       0       0       0       0       -       0       0
+Wendy                 0       1       1       0       0       0       0       0       0       0       0       1       0       0       0       1       0       1       1       0       1       0       -       1
+Zoe                   0       0       0       0       0       1       1       0       1       0       1       1       0       1       0       0       1       0       0       0       1       0       1       -
+
+MEETING STATISTICS
+--------------------
+Alice                met  7 different children
+Bob                  met  8 different children
+Carol                met  8 different children
+David                met  8 different children
+Emma                 met  8 different children
+Frank                met  9 different children
+Grace                met  7 different children
+Henry                met  7 different children
+Ivy                  met  9 different children
+Jack                 met  8 different children
+Kate                 met  8 different children
+Liam                 met  7 different children
+Mia                  met  8 different children
+Noah                 met  9 different children
+Olivia               met  9 different children
+Paul                 met  7 different children
+Quinn                met  9 different children
+Ryan                 met  7 different children
+Sophia               met  8 different children
+Tom                  met  9 different children
+Uma                  met  8 different children
+Victor               met  7 different children
+Wendy                met  8 different children
+Zoe                  met  9 different children
+
+Meeting Statistics:
+  Min: 7, Max: 9, Avg: 8.0
+
+ITERATION DETAILS
+--------------------
+
+Iteration 1:
+  Group 1: Host=Paul         (2B, 2G) Members: Paul, Ryan, Mia, Grace
+  Group 2: Host=Zoe          (2B, 2G) Members: Zoe, Liam, Wendy, Uma
+  Group 3: Host=David        (2B, 2G) Members: David, Noah, Quinn, Olivia
+  Group 4: Host=Bob          (2B, 2G) Members: Bob, Tom, Ivy, Alice
+  Group 5: Host=Victor       (2B, 2G) Members: Victor, Jack, Emma, Kate
+  Group 6: Host=Frank        (2B, 2G) Members: Frank, Henry, Sophia, Carol
+
+Iteration 2:
+  Group 1: Host=David        (2B, 2G) Members: David, Paul, Mia, Emma
+  Group 2: Host=Jack         (2B, 2G) Members: Jack, Victor, Alice, Olivia
+  Group 3: Host=Tom          (2B, 2G) Members: Tom, Ryan, Grace, Kate
+  Group 4: Host=Noah         (2B, 2G) Members: Noah, Henry, Uma, Carol
+  Group 5: Host=Frank        (2B, 2G) Members: Frank, Zoe, Quinn, Ivy
+  Group 6: Host=Bob          (2B, 2G) Members: Bob, Liam, Wendy, Sophia
+
+Iteration 3:
+  Group 1: Host=Ryan         (2B, 2G) Members: Ryan, Paul, Carol, Wendy
+  Group 2: Host=Frank        (2B, 2G) Members: Frank, Tom, Mia, Olivia
+  Group 3: Host=Victor       (2B, 2G) Members: Victor, Bob, Alice, Quinn
+  Group 4: Host=Liam         (2B, 2G) Members: Liam, Jack, Ivy, Sophia
+  Group 5: Host=Zoe          (2B, 2G) Members: Zoe, Noah, Grace, Kate
+  Group 6: Host=Henry        (2B, 2G) Members: Henry, David, Emma, Uma
+
+No warnings or constraint violations detected.
+
+==================================================
+End of Summary Report

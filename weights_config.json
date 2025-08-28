@@ -1,0 +1,20 @@
+{
+    "description": "Configuration weights for constraint satisfaction algorithm",
+    "weights": {
+        "gender_balance": 1000,
+        "host_rotation": 100,
+        "group_diversity": 50,
+        "host_fairness": 25,
+        "meeting_fairness": 10
+    },
+    "constraints": {
+        "target_boys_per_group": 2,
+        "target_girls_per_group": 2,
+        "max_hosting_difference": 1,
+        "max_meeting_difference": 2
+    },
+    "algorithm": {
+        "max_attempts": 10000,
+        "backtrack_threshold": 0.7
+    }
+}
