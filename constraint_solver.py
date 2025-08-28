@@ -152,7 +152,7 @@ class ConstraintSolver:
             diversity_score = self._calculate_diversity_score(groups, previous_iterations)
             score += self.weights['group_diversity'] * diversity_score
         
-        # 4. Host fairness
+        # 4. Host fairness with sharp penalty for hosting gaps >= 2
         hosting_counts = {}
         for group in groups:
             if group.host:
@@ -161,8 +161,16 @@ class ConstraintSolver:
         if hosting_counts:
             max_hosting = max(hosting_counts.values())
             min_hosting = min(hosting_counts.values())
-            fairness = 1 - (max_hosting - min_hosting) / max(max_hosting, 1)
-            score += self.weights['host_fairness'] * fairness
+            hosting_gap = max_hosting - min_hosting
+            
+            if hosting_gap >= 2:
+                # Apply severe penalty for hosting inequality >= 2
+                penalty = -self.weights['host_fairness'] * hosting_gap * 10
+                score += penalty
+            else:
+                # Small reward for good hosting distribution
+                fairness = 1 - hosting_gap
+                score += self.weights['host_fairness'] * fairness
         
         # 5. Meeting fairness
         meeting_fairness = self._calculate_meeting_fairness(groups)

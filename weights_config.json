@@ -4,7 +4,7 @@
         "gender_balance": 1000000,
         "host_rotation": 100,
         "group_diversity": 50,
-        "host_fairness": 25,
+        "host_fairness": 800,
         "meeting_fairness": 10
     },
     "constraints": {

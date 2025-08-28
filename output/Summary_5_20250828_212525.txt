@@ -1,0 +1,144 @@
+CHILD GROUP ROTATION SUMMARY REPORT
+==================================================
+
+Generated: 2025-08-28 21:25:25
+Total Iterations: 5
+Total Children: 24
+
+HOSTING COUNTS
+--------------------
+Bille                  4 times
+Benjamin               3 times
+Carl                   3 times
+Luca                   3 times
+Max                    3 times
+Oskar                  3 times
+Pelle                  3 times
+Adam                   2 times
+Emir                   2 times
+Norman                 2 times
+Noah                   1 times
+Tobias                 1 times
+Anna                   0 times
+Ava                    0 times
+Eleonora               0 times
+Elisa                  0 times
+Emilie                 0 times
+Freja                  0 times
+Hannah                 0 times
+Kaya Olivia            0 times
+Lou                    0 times
+Nora                   0 times
+Petra                  0 times
+Una                    0 times
+
+Hosting Statistics:
+  Min: 0, Max: 4, Avg: 1.2
+
+MEETING MATRIX
+--------------------
+Shows how many times each pair of children have been in the same group:
+
+Child              Adam    Anna     AvaBenjamin   Bille    CarlEleonora   Elisa  Emilie    Emir   Freja  HannahKaya Oli     Lou    Luca     Max    Noah    Nora  Norman   Oskar   Pelle   Petra  Tobias     Una
+Adam                  -       1       1       0       1       0       0       1       0       1       0       1       1       0       1       0       0       0       0       1       0       0       0       0
+Anna                  1       -       0       1       1       1       0       1       1       1       1       0       0       1       1       1       1       0       1       0       1       0       0       1
+Ava                   1       0       -       0       1       1       0       0       0       1       0       1       0       1       1       0       1       0       0       1       0       0       1       1
+Benjamin              0       1       0       -       0       0       1       0       1       0       1       1       0       0       0       1       1       0       0       0       1       1       0       0
+Bille                 1       1       1       0       -       0       0       1       1       0       1       1       1       0       0       0       0       0       0       0       1       0       1       1
+Carl                  0       1       1       0       0       -       1       1       0       0       0       0       1       1       1       0       1       1       1       0       0       0       0       1
+Eleonora              0       0       0       1       0       1       -       0       1       1       1       0       1       1       0       0       1       0       1       0       1       1       1       0
+Elisa                 1       1       0       0       1       1       0       -       0       1       0       1       1       0       1       0       0       1       1       0       0       0       0       1
+Emilie                0       1       0       1       1       0       1       0       -       0       0       1       1       0       0       1       1       1       1       1       0       0       1       0
+Emir                  1       1       1       0       0       0       1       1       0       -       0       0       0       1       1       0       1       1       0       0       1       1       1       0
+Freja                 0       1       0       1       1       0       1       0       0       0       -       1       0       0       0       1       0       0       0       0       1       1       0       1
+Hannah                1       0       1       1       1       0       0       1       1       0       1       -       1       0       1       1       0       0       0       1       0       0       1       0
+Kaya Olivia           1       0       0       0       1       1       1       1       1       0       0       1       -       0       0       1       0       1       1       1       0       0       0       0
+Lou                   0       1       1       0       0       1       1       0       0       1       0       0       0       -       1       0       1       0       0       0       0       0       1       0
+Luca                  1       1       1       0       0       1       0       1       0       1       0       1       0       1       -       1       0       1       0       0       0       1       0       1
+Max                   0       1       0       1       0       0       0       0       1       0       1       1       1       0       1       -       0       1       0       1       0       1       1       1
+Noah                  0       1       1       1       0       1       1       0       1       1       0       0       0       1       0       0       -       0       1       0       0       1       0       1
+Nora                  0       0       0       0       0       1       0       1       1       1       0       0       1       0       1       1       0       -       1       1       1       1       1       0
+Norman                0       1       0       0       0       1       1       1       1       0       0       0       1       0       0       0       1       1       -       1       0       0       0       1
+Oskar                 1       0       1       0       0       0       0       0       1       0       0       1       1       0       0       1       0       1       1       -       0       1       1       1
+Pelle                 0       1       0       1       1       0       1       0       0       1       1       0       0       0       0       0       0       1       0       0       -       1       0       1
+Petra                 0       0       0       1       0       0       1       0       0       1       1       0       0       0       1       1       1       1       0       1       1       -       1       1
+Tobias                0       0       1       0       1       0       1       0       1       1       0       1       0       1       0       1       0       1       0       1       0       1       -       1
+Una                   0       1       1       0       1       1       0       1       0       0       1       0       0       0       1       1       1       0       1       1       1       1       1       -
+
+MEETING STATISTICS
+--------------------
+Hannah               met 12 different children
+Ava                  met 11 different children
+Kaya Olivia          met 11 different children
+Norman               met 10 different children
+Bille                met 11 different children
+Tobias               met 12 different children
+Benjamin             met  9 different children
+Emir                 met 12 different children
+Petra                met 12 different children
+Una                  met 14 different children
+Max                  met 12 different children
+Oskar                met 11 different children
+Adam                 met  9 different children
+Emilie               met 12 different children
+Carl                 met 11 different children
+Luca                 met 12 different children
+Nora                 met 12 different children
+Lou                  met  8 different children
+Freja                met  9 different children
+Elisa                met 11 different children
+Pelle                met  9 different children
+Anna                 met 15 different children
+Eleonora             met 12 different children
+Noah                 met 11 different children
+
+Meeting Statistics:
+  Min: 8, Max: 15, Avg: 11.2
+
+ITERATION DETAILS
+--------------------
+
+Iteration 1:
+  Group 1: Host=Luca         (2B, 2G) Members: Luca, Carl, Nora, Elisa
+  Group 2: Host=Benjamin     (2B, 2G) Members: Benjamin, Pelle, Petra, Freja
+  Group 3: Host=Bille        (2B, 2G) Members: Bille, Adam, Ava, Hannah
+  Group 4: Host=Emir         (2B, 2G) Members: Emir, Tobias, Eleonora, Lou
+  Group 5: Host=Norman       (2B, 2G) Members: Norman, Noah, Anna, Una
+  Group 6: Host=Max          (2B, 2G) Members: Max, Oskar, Kaya Olivia, Emilie
+
+Iteration 2:
+  Group 1: Host=Carl         (2B, 2G) Members: Carl, Luca, Lou, Anna
+  Group 2: Host=Benjamin     (2B, 2G) Members: Benjamin, Max, Hannah, Freja
+  Group 3: Host=Pelle        (2B, 2G) Members: Pelle, Emir, Nora, Petra
+  Group 4: Host=Bille        (2B, 2G) Members: Bille, Adam, Elisa, Kaya Olivia
+  Group 5: Host=Oskar        (2B, 2G) Members: Oskar, Tobias, Ava, Una
+  Group 6: Host=Norman       (2B, 2G) Members: Norman, Noah, Eleonora, Emilie
+
+Iteration 3:
+  Group 1: Host=Bille        (2B, 2G) Members: Bille, Pelle, Anna, Freja
+  Group 2: Host=Max          (2B, 2G) Members: Max, Tobias, Emilie, Nora
+  Group 3: Host=Oskar        (2B, 2G) Members: Oskar, Adam, Kaya Olivia, Hannah
+  Group 4: Host=Carl         (2B, 2G) Members: Carl, Norman, Una, Elisa
+  Group 5: Host=Luca         (2B, 2G) Members: Luca, Emir, Ava, Lou
+  Group 6: Host=Benjamin     (2B, 2G) Members: Benjamin, Noah, Petra, Eleonora
+
+Iteration 4:
+  Group 1: Host=Noah         (2B, 2G) Members: Noah, Carl, Ava, Lou
+  Group 2: Host=Luca         (2B, 2G) Members: Luca, Max, Una, Petra
+  Group 3: Host=Oskar        (2B, 2G) Members: Oskar, Norman, Nora, Kaya Olivia
+  Group 4: Host=Bille        (2B, 2G) Members: Bille, Tobias, Emilie, Hannah
+  Group 5: Host=Adam         (2B, 2G) Members: Adam, Emir, Elisa, Anna
+  Group 6: Host=Pelle        (2B, 2G) Members: Pelle, Benjamin, Freja, Eleonora
+
+Iteration 5:
+  Group 1: Host=Tobias       (2B, 2G) Members: Tobias, Oskar, Petra, Nora
+  Group 2: Host=Carl         (2B, 2G) Members: Carl, Norman, Kaya Olivia, Eleonora
+  Group 3: Host=Adam         (2B, 2G) Members: Adam, Luca, Hannah, Elisa
+  Group 4: Host=Pelle        (2B, 2G) Members: Pelle, Bille, Una, Freja
+  Group 5: Host=Max          (2B, 2G) Members: Max, Benjamin, Anna, Emilie
+  Group 6: Host=Emir         (2B, 2G) Members: Emir, Noah, Lou, Ava
+
+No warnings or constraint violations detected.
+
+==================================================
+End of Summary Report
