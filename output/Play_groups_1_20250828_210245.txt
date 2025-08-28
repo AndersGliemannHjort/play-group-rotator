@@ -1,8 +1,0 @@
-=== ITERATION 1 ===
-David	Noah	Sophia	Ivy
-Tom	Jack	Uma	Grace
-Paul	Bob	Emma	Mia
-Henry	Frank	Alice	Kate
-Liam	Zoe	Olivia	Carol
-Victor	Ryan	Wendy	Quinn
-
