@@ -78,8 +78,12 @@ class ConstraintSolver:
         """Generate a candidate solution using host-first construction."""
         from group_optimizer import Group
         
-        # Step 1: Select 6 hosts fairly based on hosting counts
+        # Step 1: Randomize child order to eliminate systematic bias
         all_children = boys + girls
+        random.shuffle(all_children)  # Randomize the complete child list
+        self.log_debug(f"🎲 Randomized complete child order for solution generation")
+        
+        # Step 2: Select 6 hosts fairly based on hosting counts
         hosts = self._select_hosts(all_children, 6)
         
         if len(hosts) != 6:
@@ -113,10 +117,20 @@ class ConstraintSolver:
         """Select hosts fairly based on hosting counts and break lengths."""
         self.log_debug(f"\n--- Selecting {num_hosts} hosts ---")
         
+        # STEP 1: Randomize the order of children to eliminate alphabetical bias
+        randomized_children = all_children.copy()
+        random.shuffle(randomized_children)
+        
+        original_order = [child.name for child in all_children]
+        randomized_order = [child.name for child in randomized_children]
+        self.log_debug(f"\n🎲 RANDOMIZATION APPLIED:")
+        self.log_debug(f"   Original order: {original_order[:6]}... (first 6)")
+        self.log_debug(f"   Randomized order: {randomized_order[:6]}... (first 6)")
+        
         # Calculate break lengths for all children
         self.log_debug(f"\n--- Calculating break lengths for iteration {self.current_iteration} ---")
         children_with_breaks = []
-        for child in all_children:
+        for child in randomized_children:
             break_length = self._calculate_break_length(child)
             children_with_breaks.append((child, break_length))
             if child.hosting_count == 0:
@@ -125,13 +139,13 @@ class ConstraintSolver:
                 last_hosting = max(child.hosting_iterations) if child.hosting_iterations else 0
                 self.log_debug(f"  {child.name}: last hosted in iteration {last_hosting}, break length = {break_length}")
         
-        # Sort children by (hosting_count, -break_length, name) 
-        # -break_length so longer breaks come first (higher priority)
+        # Sort children by (hosting_count, -break_length) WITHOUT name tiebreaker
+        # This ensures randomized order is preserved when other criteria are equal
         candidates = sorted(children_with_breaks, 
-                          key=lambda x: (x[0].hosting_count, -x[1], x[0].name))
+                          key=lambda x: (x[0].hosting_count, -x[1]))
         
         # Log the complete sorting criteria
-        self.log_debug(f"\n--- Children sorted by (hosting_count, break_length, name) ---")
+        self.log_debug(f"\n--- Children sorted by (hosting_count, break_length) with randomized tiebreaking ---")
         for child, break_length in candidates:
             self.log_debug(f"  {child.name}: hosting={child.hosting_count}, break={break_length}")
         
@@ -153,17 +167,28 @@ class ConstraintSolver:
         selected_hosts = []
         
         if len(min_hosting_children) >= num_hosts:
-            # Take the first num_hosts from sorted list (best break lengths)
-            for i, (child, break_len) in enumerate(min_hosting_children):
+            # Randomize the order within same hosting count and break length groups
+            # to eliminate deterministic selection patterns
+            min_hosting_randomized = min_hosting_children.copy()
+            random.shuffle(min_hosting_randomized)
+            
+            self.log_debug(f"\n🎲 Randomizing selection within min hosting group:")
+            original_min_order = [child.name for child, _ in min_hosting_children[:num_hosts+2]]
+            randomized_min_order = [child.name for child, _ in min_hosting_randomized[:num_hosts+2]]
+            self.log_debug(f"   Before shuffle: {original_min_order}")
+            self.log_debug(f"   After shuffle: {randomized_min_order}")
+            
+            # Take the first num_hosts from randomized list
+            for i, (child, break_len) in enumerate(min_hosting_randomized):
                 if i < num_hosts:
                     selected_hosts.append(child)
                     consecutive = break_len == 0 and child.hosting_count > 0
                     reason = f"hosting={child.hosting_count}, break={break_len}"
                     if consecutive:
                         reason += " (consecutive hosting)"
-                    self.log_debug(f"  ✓ {child.name}: {reason}")
-                else:
-                    self.log_debug(f"  ✗ {child.name}: hosting={child.hosting_count}, break={break_len} (not needed)")
+                    self.log_debug(f"  ✓ {child.name}: {reason} (randomized selection)")
+                elif i < num_hosts + 3:  # Show a few rejected for context
+                    self.log_debug(f"  ✗ {child.name}: hosting={child.hosting_count}, break={break_len} (not selected in random draw)")
         else:
             # Take all min hosting children
             for child, break_len in min_hosting_children:
@@ -177,9 +202,12 @@ class ConstraintSolver:
             remaining_needed = num_hosts - len(selected_hosts)
             self.log_debug(f"\nNeed {remaining_needed} more hosts from higher hosting counts:")
             
-            # Get remaining candidates sorted by break length
+            # Get remaining candidates and randomize them too
             remaining_candidates = [(child, break_len) for child, break_len in candidates 
                                   if child not in selected_hosts]
+            random.shuffle(remaining_candidates)
+            
+            self.log_debug(f"🎲 Randomizing remaining candidate selection order")
             
             for i, (child, break_len) in enumerate(remaining_candidates):
                 if i < remaining_needed:
@@ -188,9 +216,9 @@ class ConstraintSolver:
                     reason = f"hosting={child.hosting_count}, break={break_len}"
                     if consecutive:
                         reason += " (consecutive hosting)"
-                    self.log_debug(f"  ✓ {child.name}: {reason}")
+                    self.log_debug(f"  ✓ {child.name}: {reason} (randomized selection)")
                 elif i < remaining_needed + 3:  # Show a few rejected for context
-                    self.log_debug(f"  ✗ {child.name}: hosting={child.hosting_count}, break={break_len} (not needed)")
+                    self.log_debug(f"  ✗ {child.name}: hosting={child.hosting_count}, break={break_len} (not selected in random draw)")
         
         # Log consecutive hosting prevention summary
         consecutive_count = sum(1 for host in selected_hosts 
