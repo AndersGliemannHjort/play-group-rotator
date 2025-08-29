@@ -215,7 +215,12 @@ class ConstraintSolver:
                 fairness = 1 - hosting_gap
                 score += self.weights['host_fairness'] * fairness
         
-        # 5. Meeting fairness
+        # 5. Hosting break balance (minimize consecutive hosting)
+        if iteration_num > 1:
+            break_balance_score = self._calculate_hosting_break_balance(groups, iteration_num, previous_iterations)
+            score += self.weights['hosting_break_balance'] * break_balance_score
+        
+        # 6. Meeting fairness
         meeting_fairness = self._calculate_meeting_fairness(groups)
         score += self.weights['meeting_fairness'] * meeting_fairness
         
@@ -268,10 +273,77 @@ class ConstraintSolver:
         
         return 1 - (max_meetings - min_meetings) / max(max_meetings, 1)
     
+    def _calculate_hosting_break_balance(self, groups, iteration_num, previous_iterations):
+        """Calculate hosting break balance score using squared deviation penalty."""
+        if iteration_num <= 1:
+            return 0.0
+        
+        # Get current hosts in this iteration
+        current_hosts = []
+        for group in groups:
+            if group.host:
+                current_hosts.append(group.host)
+        
+        if not current_hosts:
+            return 0.0
+        
+        # Calculate hosting breaks for children who have hosted multiple times
+        all_hosting_breaks = []
+        
+        # Build complete hosting history for all children
+        all_children_hosting = {}
+        
+        # Add previous iterations hosting
+        for iter_idx, iteration in enumerate(previous_iterations, 1):
+            for group in iteration:
+                if group.host:
+                    child_name = group.host.name
+                    if child_name not in all_children_hosting:
+                        all_children_hosting[child_name] = []
+                    all_children_hosting[child_name].append(iter_idx)
+        
+        # Add current iteration hosting
+        for host in current_hosts:
+            if host.name not in all_children_hosting:
+                all_children_hosting[host.name] = []
+            all_children_hosting[host.name].append(iteration_num)
+        
+        # Calculate breaks for children with multiple hostings
+        for child_name, hosting_iterations in all_children_hosting.items():
+            if len(hosting_iterations) > 1:
+                sorted_iterations = sorted(hosting_iterations)
+                for i in range(1, len(sorted_iterations)):
+                    break_length = sorted_iterations[i] - sorted_iterations[i-1] - 1
+                    all_hosting_breaks.append(break_length)
+        
+        if not all_hosting_breaks:
+            return 0.0  # No breaks to evaluate yet
+        
+        # Calculate average break length
+        average_break = sum(all_hosting_breaks) / len(all_hosting_breaks)
+        
+        # Calculate penalty for current hosts' new breaks
+        total_penalty = 0.0
+        for host in current_hosts:
+            host_iterations = all_children_hosting.get(host.name, [])
+            if len(host_iterations) > 1:
+                # Get the most recent break (which includes this iteration)
+                sorted_iterations = sorted(host_iterations)
+                latest_break = sorted_iterations[-1] - sorted_iterations[-2] - 1
+                
+                # Apply squared deviation penalty
+                deviation = latest_break - average_break
+                penalty = -(deviation ** 2)
+                total_penalty += penalty
+        
+        # Normalize by number of current hosts
+        return total_penalty / len(current_hosts) if current_hosts else 0.0
+    
     def _get_perfect_score(self):
         """Calculate the theoretical perfect score."""
-        return (self.weights['gender_balance'] * 6 +  # Perfect gender balance
-                self.weights['host_rotation'] +        # Perfect host rotation
-                self.weights['group_diversity'] +      # Perfect diversity
-                self.weights['host_fairness'] +        # Perfect host fairness
-                self.weights['meeting_fairness'])      # Perfect meeting fairness
+        return (self.weights['gender_balance'] * 6 +     # Perfect gender balance
+                self.weights['hosting_break_balance'] +   # Perfect break balance
+                self.weights['host_rotation'] +           # Perfect host rotation
+                self.weights['group_diversity'] +         # Perfect diversity
+                self.weights['host_fairness'] +           # Perfect host fairness
+                self.weights['meeting_fairness'])         # Perfect meeting fairness
