@@ -8,6 +8,11 @@
         "host_fairness": 800,
         "meeting_fairness": 10
     },
+    "meeting_diversity": {
+        "base_weight": 50,
+        "penalty_exponent": 2.5,
+        "max_penalty_cap": 5000
+    },
     "constraints": {
         "target_boys_per_group": 2,
         "target_girls_per_group": 2,

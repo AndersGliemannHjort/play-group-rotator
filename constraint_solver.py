@@ -427,10 +427,9 @@ class ConstraintSolver:
             non_repeat_hosts = len(current_hosts - previous_hosts)
             score += self.weights['host_rotation'] * (non_repeat_hosts / 6)
         
-        # 3. Group diversity (avoiding same children together)
-        if iteration_num > 1:
-            diversity_score = self._calculate_diversity_score(groups, previous_iterations)
-            score += self.weights['group_diversity'] * diversity_score
+        # 3. Progressive meeting diversity penalty (exponentially punishes repeated pairings)
+        progressive_penalty = self._calculate_progressive_meeting_penalty(groups)
+        score -= progressive_penalty  # Subtract penalty from score
         
         # 4. Host fairness with sharp penalty for hosting gaps >= 2
         hosting_counts = {}
@@ -467,6 +466,7 @@ class ConstraintSolver:
         # Log final score breakdown for this solution
         current_host_names = [group.host.name for group in groups if group.host]
         self.log_debug(f"Solution score breakdown for hosts {current_host_names}:")
+        self.log_debug(f"  Progressive meeting penalty: -{progressive_penalty:.2f}")
         self.log_debug(f"  Break balance contribution: {break_balance_contribution:.2f}")
         self.log_debug(f"  Total score: {score:.2f}")
         
@@ -496,6 +496,61 @@ class ConstraintSolver:
                         diverse_pairs += 1
         
         return diverse_pairs / max(total_pairs, 1)
+    
+    def _calculate_progressive_meeting_penalty(self, groups):
+        """Calculate progressive penalty based on how many times children have already met."""
+        total_penalty = 0
+        
+        # Get meeting diversity configuration
+        meeting_config = self.config.get('meeting_diversity', {
+            'base_weight': 50,
+            'penalty_exponent': 2.5,
+            'max_penalty_cap': 5000
+        })
+        
+        base_weight = meeting_config['base_weight']
+        exponent = meeting_config['penalty_exponent']
+        max_cap = meeting_config['max_penalty_cap']
+        
+        self.log_debug(f"\n--- Progressive meeting diversity penalty calculation ---")
+        self.log_debug(f"Config: base_weight={base_weight}, exponent={exponent}, max_cap={max_cap}")
+        
+        penalty_details = []
+        
+        # Calculate penalty for each pair in current groups
+        for group_idx, group in enumerate(groups):
+            for i in range(len(group.children)):
+                for j in range(i + 1, len(group.children)):
+                    child1 = group.children[i]
+                    child2 = group.children[j]
+                    
+                    # Get current meeting count between these two children
+                    meeting_count = 0
+                    if child2.name in child1.meetings:
+                        meeting_count = child1.meetings[child2.name]
+                    
+                    if meeting_count > 0:
+                        # Apply progressive penalty: base_weight * (meeting_count ^ exponent)
+                        penalty = base_weight * (meeting_count ** exponent)
+                        
+                        # Apply cap if specified
+                        if max_cap and penalty > max_cap:
+                            penalty = max_cap
+                        
+                        total_penalty += penalty
+                        penalty_details.append((child1.name, child2.name, meeting_count, penalty))
+        
+        # Log penalty details
+        if penalty_details:
+            self.log_debug(f"Meeting penalty breakdown:")
+            for child1, child2, count, penalty in penalty_details:
+                self.log_debug(f"  {child1}-{child2}: {count} previous meetings → penalty {penalty:.1f}")
+        else:
+            self.log_debug("No previous meetings found, no penalties applied")
+        
+        self.log_debug(f"Total progressive meeting penalty: {total_penalty:.1f}")
+        
+        return total_penalty
     
     def _calculate_meeting_fairness(self, groups):
         """Calculate fairness of meeting distribution."""
