@@ -59,6 +59,39 @@ class OutputFormatter:
                 f.write(f"\nHosting Statistics:\n")
                 f.write(f"  Min: {min(counts)}, Max: {max(counts)}, Avg: {sum(counts)/len(counts):.1f}\n\n")
                 
+                # Write hosting proximity section
+                f.write("HOSTING PROXIMITY\n")
+                f.write("-" * 17 + "\n")
+                f.write("Shows minimum iterations between hosting periods (children who host multiple times):\n\n")
+                
+                # Calculate hosting proximity for children with multiple hostings
+                proximity_data = []
+                for child in children:
+                    if hasattr(child, 'hosting_iterations') and len(child.hosting_iterations) > 1:
+                        # Calculate all breaks between hosting periods
+                        sorted_iterations = sorted(child.hosting_iterations)
+                        breaks = []
+                        for i in range(1, len(sorted_iterations)):
+                            break_length = sorted_iterations[i] - sorted_iterations[i-1] - 1
+                            breaks.append(break_length)
+                        
+                        # Get minimum break
+                        min_break = min(breaks)
+                        proximity_data.append((child.name, min_break, sorted_iterations))
+                
+                # Sort by minimum break (ascending), then by name (alphabetical)
+                proximity_data.sort(key=lambda x: (x[1], x[0]))
+                
+                if proximity_data:
+                    for name, min_break, iterations in proximity_data:
+                        iteration_list = ", ".join(map(str, iterations))
+                        break_text = "iteration" if min_break == 1 else "iterations"
+                        f.write(f"{name:<20} {min_break} {break_text} (hosted in: {iteration_list})\n")
+                else:
+                    f.write("No children hosted multiple times.\n")
+                
+                f.write("\n")
+                
                 # Write meeting details in vertical list format
                 f.write("MEETING DETAILS\n")
                 f.write("-" * 20 + "\n")

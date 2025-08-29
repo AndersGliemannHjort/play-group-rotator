@@ -78,7 +78,7 @@ class GroupOptimizer:
             return None
         
         # Update child statistics
-        self._update_child_statistics(children, groups)
+        self._update_child_statistics(children, groups, iteration_num)
         
         # Validate groups
         if not self._validate_groups(groups, iteration_num):
@@ -86,12 +86,13 @@ class GroupOptimizer:
         
         return groups
     
-    def _update_child_statistics(self, children, groups):
+    def _update_child_statistics(self, children, groups, iteration_num):
         """Update hosting counts and meeting records for children."""
         for group in groups:
             # Update host count
             if group.host:
                 group.host.hosting_count += 1
+                group.host.hosting_iterations.append(iteration_num)
             
             # Update meetings - each child meets every other child in their group
             for i, child1 in enumerate(group.children):
