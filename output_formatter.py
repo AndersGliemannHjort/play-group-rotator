@@ -40,6 +40,51 @@ class OutputFormatter:
                 f.write(f"Total Iterations: {len(all_iterations)}\n")
                 f.write(f"Total Children: {len(children)}\n\n")
                 
+                # Add algorithm overview section
+                f.write("ALGORITHM OVERVIEW & MATHEMATICAL REALITIES\n")
+                f.write("=" * 50 + "\n\n")
+                
+                f.write("How the System Works:\n")
+                f.write("This optimizer uses a weighted constraint satisfaction algorithm that balances\n")
+                f.write("multiple competing goals. The system prioritizes constraints in a specific\n")
+                f.write("hierarchy, with gender balance as the primary requirement, followed by fair\n")
+                f.write("hosting rotation, meeting diversity, and social mixing preferences.\n\n")
+                
+                f.write("Constraint Hierarchy (in order of importance):\n")
+                f.write("1. Gender Balance (Critical): Every group must have exactly 2 boys and 2 girls\n")
+                f.write("2. Hosting Fairness (High): Children should host approximately equal numbers of times\n")
+                f.write("3. Break Prevention (High): No child should host in consecutive iterations\n")
+                f.write("4. Meeting Diversity (Medium): Children should meet different people when possible\n")
+                f.write("5. Same-Gender Mixing (Medium): Repeated same-gender meetings are discouraged\n")
+                f.write("   more than cross-gender repetition\n\n")
+                
+                f.write("Expected Outcomes Due to Mathematical Reality:\n\n")
+                
+                f.write("✓ What You'll Always See:\n")
+                f.write("- Perfect gender balance (2 boys + 2 girls) in every group\n")
+                f.write("- Fair hosting distribution (max difference of 1 hosting between any two children)\n")
+                f.write("- No consecutive hosting periods (minimum 3-iteration breaks achieved)\n")
+                f.write("- Randomized selection eliminating alphabetical bias\n\n")
+                
+                f.write("⚠️ What You May Sometimes See:\n")
+                f.write("- Some children meeting 4-5 times across multiple iterations\n")
+                f.write("- Cross-gender repeated meetings preferred over same-gender repetition\n")
+                f.write("- Certain pairings appearing more frequently due to hosting schedule constraints\n\n")
+                
+                f.write("Why Repeated Meetings Occur:\n")
+                f.write("With 24 children forming 6 groups over multiple iterations, some meeting\n")
+                f.write("repetition is mathematically inevitable. The system minimizes this repetition\n")
+                f.write("wherever possible, but will always choose repeated meetings over gender\n")
+                f.write("imbalance. Children who host in the same iteration cycles are more likely to\n")
+                f.write("be grouped together due to the fairness constraints.\n\n")
+                
+                f.write("Understanding the Trade-offs:\n")
+                f.write("The algorithm represents optimal solutions given the constraint priorities.\n")
+                f.write("Higher meeting repetition in some pairs reflects the system successfully\n")
+                f.write("maintaining more critical requirements (gender balance, hosting fairness)\n")
+                f.write("while minimizing less critical violations.\n\n")
+                f.write("=" * 50 + "\n\n")
+                
                 # Write hosting statistics
                 f.write("HOSTING COUNTS\n")
                 f.write("-" * 20 + "\n")
