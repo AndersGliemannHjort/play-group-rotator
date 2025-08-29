@@ -1,0 +1,194 @@
+CONSTRAINT SOLVER DEBUG LOG
+==================================================
+
+[19:59:07.212] === ConstraintSolver Debug Log Started ===
+[19:59:07.212] Weights: {'gender_balance': 1000000, 'hosting_break_balance': 100000, 'host_rotation': 100, 'group_diversity': 50, 'host_fairness': 800, 'meeting_fairness': 10}
+[19:59:07.212] Constraints: {'target_boys_per_group': 2, 'target_girls_per_group': 2, 'max_hosting_difference': 1, 'max_meeting_difference': 2}
+[19:59:07.213] 
+=== SOLVING ITERATION 1 ===
+[19:59:07.213] Children: ['Hannah', 'Ava', 'Kaya Olivia', 'Norman', 'Bille', 'Tobias', 'Benjamin', 'Emir', 'Petra', 'Una', 'Max', 'Oskar', 'Adam', 'Emilie', 'Carl', 'Luca', 'Nora', 'Lou', 'Freja', 'Elisa', 'Pelle', 'Anna', 'Eleonora', 'Noah']
+[19:59:07.213] Previous iterations: 0
+[19:59:07.213] 
+--- Selecting 6 hosts ---
+[19:59:07.213] Children by hosting count: [('Adam', 0), ('Anna', 0), ('Ava', 0), ('Benjamin', 0), ('Bille', 0), ('Carl', 0), ('Eleonora', 0), ('Elisa', 0), ('Emilie', 0), ('Emir', 0), ('Freja', 0), ('Hannah', 0), ('Kaya Olivia', 0), ('Lou', 0), ('Luca', 0), ('Max', 0), ('Noah', 0), ('Nora', 0), ('Norman', 0), ('Oskar', 0), ('Pelle', 0), ('Petra', 0), ('Tobias', 0), ('Una', 0)]
+[19:59:07.213] Minimum hosting count: 0
+[19:59:07.213] Children with min hosting: ['Adam', 'Anna', 'Ava', 'Benjamin', 'Bille', 'Carl', 'Eleonora', 'Elisa', 'Emilie', 'Emir', 'Freja', 'Hannah', 'Kaya Olivia', 'Lou', 'Luca', 'Max', 'Noah', 'Nora', 'Norman', 'Oskar', 'Pelle', 'Petra', 'Tobias', 'Una']
+[19:59:07.213] Solution score breakdown for hosts ['Lou', 'Ava', 'Luca', 'Max', 'Nora', 'Pelle']:
+[19:59:07.213]   Break balance contribution: 0.00
+[19:59:07.213]   Total score: 6000810.00
+[19:59:07.213] 
+=== SOLVING ITERATION 2 ===
+[19:59:07.213] Children: ['Hannah', 'Ava', 'Kaya Olivia', 'Norman', 'Bille', 'Tobias', 'Benjamin', 'Emir', 'Petra', 'Una', 'Max', 'Oskar', 'Adam', 'Emilie', 'Carl', 'Luca', 'Nora', 'Lou', 'Freja', 'Elisa', 'Pelle', 'Anna', 'Eleonora', 'Noah']
+[19:59:07.213] Previous iterations: 1
+[19:59:07.213] 
+--- Selecting 6 hosts ---
+[19:59:07.213] Children by hosting count: [('Adam', 0), ('Anna', 0), ('Benjamin', 0), ('Bille', 0), ('Carl', 0), ('Eleonora', 0), ('Elisa', 0), ('Emilie', 0), ('Emir', 0), ('Freja', 0), ('Hannah', 0), ('Kaya Olivia', 0), ('Noah', 0), ('Norman', 0), ('Oskar', 0), ('Petra', 0), ('Tobias', 0), ('Una', 0), ('Ava', 1), ('Lou', 1), ('Luca', 1), ('Max', 1), ('Nora', 1), ('Pelle', 1)]
+[19:59:07.213] Minimum hosting count: 0
+[19:59:07.213] Children with min hosting: ['Adam', 'Anna', 'Benjamin', 'Bille', 'Carl', 'Eleonora', 'Elisa', 'Emilie', 'Emir', 'Freja', 'Hannah', 'Kaya Olivia', 'Noah', 'Norman', 'Oskar', 'Petra', 'Tobias', 'Una']
+[19:59:07.213] 
+--- Calculating hosting break balance for iteration 2 ---
+[19:59:07.213] Current hosts: ['Elisa', 'Oskar', 'Freja', 'Carl', 'Eleonora', 'Adam']
+[19:59:07.213] Complete hosting history: {'Lou': [1], 'Ava': [1], 'Luca': [1], 'Max': [1], 'Nora': [1], 'Pelle': [1], 'Elisa': [2], 'Oskar': [2], 'Freja': [2], 'Carl': [2], 'Eleonora': [2], 'Adam': [2]}
+[19:59:07.213] No hosting breaks to evaluate yet
+[19:59:07.213] Solution score breakdown for hosts ['Elisa', 'Oskar', 'Freja', 'Carl', 'Eleonora', 'Adam']:
+[19:59:07.213]   Break balance contribution: 0.00
+[19:59:07.213]   Total score: 6000954.17
+[19:59:07.213] 
+=== SOLVING ITERATION 3 ===
+[19:59:07.213] Children: ['Hannah', 'Ava', 'Kaya Olivia', 'Norman', 'Bille', 'Tobias', 'Benjamin', 'Emir', 'Petra', 'Una', 'Max', 'Oskar', 'Adam', 'Emilie', 'Carl', 'Luca', 'Nora', 'Lou', 'Freja', 'Elisa', 'Pelle', 'Anna', 'Eleonora', 'Noah']
+[19:59:07.213] Previous iterations: 2
+[19:59:07.213] 
+--- Selecting 6 hosts ---
+[19:59:07.213] Children by hosting count: [('Anna', 0), ('Benjamin', 0), ('Bille', 0), ('Emilie', 0), ('Emir', 0), ('Hannah', 0), ('Kaya Olivia', 0), ('Noah', 0), ('Norman', 0), ('Petra', 0), ('Tobias', 0), ('Una', 0), ('Adam', 1), ('Ava', 1), ('Carl', 1), ('Eleonora', 1), ('Elisa', 1), ('Freja', 1), ('Lou', 1), ('Luca', 1), ('Max', 1), ('Nora', 1), ('Oskar', 1), ('Pelle', 1)]
+[19:59:07.213] Minimum hosting count: 0
+[19:59:07.213] Children with min hosting: ['Anna', 'Benjamin', 'Bille', 'Emilie', 'Emir', 'Hannah', 'Kaya Olivia', 'Noah', 'Norman', 'Petra', 'Tobias', 'Una']
+[19:59:07.214] 
+--- Calculating hosting break balance for iteration 3 ---
+[19:59:07.214] Current hosts: ['Norman', 'Noah', 'Bille', 'Hannah', 'Benjamin', 'Emilie']
+[19:59:07.214] Complete hosting history: {'Lou': [1], 'Ava': [1], 'Luca': [1], 'Max': [1], 'Nora': [1], 'Pelle': [1], 'Elisa': [2], 'Oskar': [2], 'Freja': [2], 'Carl': [2], 'Eleonora': [2], 'Adam': [2], 'Norman': [3], 'Noah': [3], 'Bille': [3], 'Hannah': [3], 'Benjamin': [3], 'Emilie': [3]}
+[19:59:07.214] No hosting breaks to evaluate yet
+[19:59:07.214] Solution score breakdown for hosts ['Norman', 'Noah', 'Bille', 'Hannah', 'Benjamin', 'Emilie']:
+[19:59:07.214]   Break balance contribution: 0.00
+[19:59:07.214]   Total score: 6000946.94
+[19:59:07.214] 
+=== SOLVING ITERATION 4 ===
+[19:59:07.214] Children: ['Hannah', 'Ava', 'Kaya Olivia', 'Norman', 'Bille', 'Tobias', 'Benjamin', 'Emir', 'Petra', 'Una', 'Max', 'Oskar', 'Adam', 'Emilie', 'Carl', 'Luca', 'Nora', 'Lou', 'Freja', 'Elisa', 'Pelle', 'Anna', 'Eleonora', 'Noah']
+[19:59:07.214] Previous iterations: 3
+[19:59:07.214] 
+--- Selecting 6 hosts ---
+[19:59:07.214] Children by hosting count: [('Anna', 0), ('Emir', 0), ('Kaya Olivia', 0), ('Petra', 0), ('Tobias', 0), ('Una', 0), ('Adam', 1), ('Ava', 1), ('Benjamin', 1), ('Bille', 1), ('Carl', 1), ('Eleonora', 1), ('Elisa', 1), ('Emilie', 1), ('Freja', 1), ('Hannah', 1), ('Lou', 1), ('Luca', 1), ('Max', 1), ('Noah', 1), ('Nora', 1), ('Norman', 1), ('Oskar', 1), ('Pelle', 1)]
+[19:59:07.214] Minimum hosting count: 0
+[19:59:07.214] Children with min hosting: ['Anna', 'Emir', 'Kaya Olivia', 'Petra', 'Tobias', 'Una']
+[19:59:07.214] 
+--- Calculating hosting break balance for iteration 4 ---
+[19:59:07.214] Current hosts: ['Tobias', 'Una', 'Emir', 'Anna', 'Petra', 'Kaya Olivia']
+[19:59:07.214] Complete hosting history: {'Lou': [1], 'Ava': [1], 'Luca': [1], 'Max': [1], 'Nora': [1], 'Pelle': [1], 'Elisa': [2], 'Oskar': [2], 'Freja': [2], 'Carl': [2], 'Eleonora': [2], 'Adam': [2], 'Norman': [3], 'Noah': [3], 'Bille': [3], 'Hannah': [3], 'Benjamin': [3], 'Emilie': [3], 'Tobias': [4], 'Una': [4], 'Emir': [4], 'Anna': [4], 'Petra': [4], 'Kaya Olivia': [4]}
+[19:59:07.214] No hosting breaks to evaluate yet
+[19:59:07.214] Solution score breakdown for hosts ['Tobias', 'Una', 'Emir', 'Anna', 'Petra', 'Kaya Olivia']:
+[19:59:07.214]   Break balance contribution: 0.00
+[19:59:07.214]   Total score: 6000938.61
+[19:59:07.214] 
+=== SOLVING ITERATION 5 ===
+[19:59:07.214] Children: ['Hannah', 'Ava', 'Kaya Olivia', 'Norman', 'Bille', 'Tobias', 'Benjamin', 'Emir', 'Petra', 'Una', 'Max', 'Oskar', 'Adam', 'Emilie', 'Carl', 'Luca', 'Nora', 'Lou', 'Freja', 'Elisa', 'Pelle', 'Anna', 'Eleonora', 'Noah']
+[19:59:07.214] Previous iterations: 4
+[19:59:07.214] 
+--- Selecting 6 hosts ---
+[19:59:07.214] Children by hosting count: [('Adam', 1), ('Anna', 1), ('Ava', 1), ('Benjamin', 1), ('Bille', 1), ('Carl', 1), ('Eleonora', 1), ('Elisa', 1), ('Emilie', 1), ('Emir', 1), ('Freja', 1), ('Hannah', 1), ('Kaya Olivia', 1), ('Lou', 1), ('Luca', 1), ('Max', 1), ('Noah', 1), ('Nora', 1), ('Norman', 1), ('Oskar', 1), ('Pelle', 1), ('Petra', 1), ('Tobias', 1), ('Una', 1)]
+[19:59:07.214] Minimum hosting count: 1
+[19:59:07.214] Children with min hosting: ['Adam', 'Anna', 'Ava', 'Benjamin', 'Bille', 'Carl', 'Eleonora', 'Elisa', 'Emilie', 'Emir', 'Freja', 'Hannah', 'Kaya Olivia', 'Lou', 'Luca', 'Max', 'Noah', 'Nora', 'Norman', 'Oskar', 'Pelle', 'Petra', 'Tobias', 'Una']
+[19:59:07.214] 
+--- Calculating hosting break balance for iteration 5 ---
+[19:59:07.214] Current hosts: ['Lou', 'Freja', 'Bille', 'Hannah', 'Tobias', 'Emilie']
+[19:59:07.214] Complete hosting history: {'Lou': [1, 5], 'Ava': [1], 'Luca': [1], 'Max': [1], 'Nora': [1], 'Pelle': [1], 'Elisa': [2], 'Oskar': [2], 'Freja': [2, 5], 'Carl': [2], 'Eleonora': [2], 'Adam': [2], 'Norman': [3], 'Noah': [3], 'Bille': [3, 5], 'Hannah': [3, 5], 'Benjamin': [3], 'Emilie': [3, 5], 'Tobias': [4, 5], 'Una': [4], 'Emir': [4], 'Anna': [4], 'Petra': [4], 'Kaya Olivia': [4]}
+[19:59:07.214] All hosting breaks: [3, 2, 1, 1, 1, 0]
+[19:59:07.214] Average break length: 1.33
+[19:59:07.214] Host Lou: iterations [1, 5], latest break=3, deviation=1.67, penalty=-2.78
+[19:59:07.214] Host Freja: iterations [2, 5], latest break=2, deviation=0.67, penalty=-0.44
+[19:59:07.214] Host Bille: iterations [3, 5], latest break=1, deviation=-0.33, penalty=-0.11
+[19:59:07.214] Host Hannah: iterations [3, 5], latest break=1, deviation=-0.33, penalty=-0.11
+[19:59:07.214] Host Tobias: iterations [4, 5], latest break=0, deviation=-1.33, penalty=-1.78
+[19:59:07.214] Host Emilie: iterations [3, 5], latest break=1, deviation=-0.33, penalty=-0.11
+[19:59:07.214] Total penalty: -5.33, Final break balance score: -0.89
+[19:59:07.214] Solution score breakdown for hosts ['Lou', 'Freja', 'Bille', 'Hannah', 'Tobias', 'Emilie']:
+[19:59:07.214]   Break balance contribution: -88888.89
+[19:59:07.214]   Total score: 5911949.52
+[19:59:07.214] 
+=== SOLVING ITERATION 6 ===
+[19:59:07.214] Children: ['Hannah', 'Ava', 'Kaya Olivia', 'Norman', 'Bille', 'Tobias', 'Benjamin', 'Emir', 'Petra', 'Una', 'Max', 'Oskar', 'Adam', 'Emilie', 'Carl', 'Luca', 'Nora', 'Lou', 'Freja', 'Elisa', 'Pelle', 'Anna', 'Eleonora', 'Noah']
+[19:59:07.214] Previous iterations: 5
+[19:59:07.214] 
+--- Selecting 6 hosts ---
+[19:59:07.215] Children by hosting count: [('Adam', 1), ('Anna', 1), ('Ava', 1), ('Benjamin', 1), ('Carl', 1), ('Eleonora', 1), ('Elisa', 1), ('Emir', 1), ('Kaya Olivia', 1), ('Luca', 1), ('Max', 1), ('Noah', 1), ('Nora', 1), ('Norman', 1), ('Oskar', 1), ('Pelle', 1), ('Petra', 1), ('Una', 1), ('Bille', 2), ('Emilie', 2), ('Freja', 2), ('Hannah', 2), ('Lou', 2), ('Tobias', 2)]
+[19:59:07.215] Minimum hosting count: 1
+[19:59:07.215] Children with min hosting: ['Adam', 'Anna', 'Ava', 'Benjamin', 'Carl', 'Eleonora', 'Elisa', 'Emir', 'Kaya Olivia', 'Luca', 'Max', 'Noah', 'Nora', 'Norman', 'Oskar', 'Pelle', 'Petra', 'Una']
+[19:59:07.215] 
+--- Calculating hosting break balance for iteration 6 ---
+[19:59:07.215] Current hosts: ['Adam', 'Una', 'Pelle', 'Eleonora', 'Carl', 'Benjamin']
+[19:59:07.215] Complete hosting history: {'Lou': [1, 5], 'Ava': [1], 'Luca': [1], 'Max': [1], 'Nora': [1], 'Pelle': [1, 6], 'Elisa': [2], 'Oskar': [2], 'Freja': [2, 5], 'Carl': [2, 6], 'Eleonora': [2, 6], 'Adam': [2, 6], 'Norman': [3], 'Noah': [3], 'Bille': [3, 5], 'Hannah': [3, 5], 'Benjamin': [3, 6], 'Emilie': [3, 5], 'Tobias': [4, 5], 'Una': [4, 6], 'Emir': [4], 'Anna': [4], 'Petra': [4], 'Kaya Olivia': [4]}
+[19:59:07.215] All hosting breaks: [3, 4, 2, 3, 3, 3, 1, 1, 2, 1, 0, 1]
+[19:59:07.215] Average break length: 2.00
+[19:59:07.215] Host Adam: iterations [2, 6], latest break=3, deviation=1.00, penalty=-1.00
+[19:59:07.215] Host Una: iterations [4, 6], latest break=1, deviation=-1.00, penalty=-1.00
+[19:59:07.215] Host Pelle: iterations [1, 6], latest break=4, deviation=2.00, penalty=-4.00
+[19:59:07.215] Host Eleonora: iterations [2, 6], latest break=3, deviation=1.00, penalty=-1.00
+[19:59:07.215] Host Carl: iterations [2, 6], latest break=3, deviation=1.00, penalty=-1.00
+[19:59:07.215] Host Benjamin: iterations [3, 6], latest break=2, deviation=0.00, penalty=-0.00
+[19:59:07.215] Total penalty: -8.00, Final break balance score: -1.33
+[19:59:07.215] Solution score breakdown for hosts ['Adam', 'Una', 'Pelle', 'Eleonora', 'Carl', 'Benjamin']:
+[19:59:07.215]   Break balance contribution: -133333.33
+[19:59:07.215]   Total score: 5867490.67
+[19:59:07.215] 
+=== SOLVING ITERATION 7 ===
+[19:59:07.215] Children: ['Hannah', 'Ava', 'Kaya Olivia', 'Norman', 'Bille', 'Tobias', 'Benjamin', 'Emir', 'Petra', 'Una', 'Max', 'Oskar', 'Adam', 'Emilie', 'Carl', 'Luca', 'Nora', 'Lou', 'Freja', 'Elisa', 'Pelle', 'Anna', 'Eleonora', 'Noah']
+[19:59:07.215] Previous iterations: 6
+[19:59:07.215] 
+--- Selecting 6 hosts ---
+[19:59:07.215] Children by hosting count: [('Anna', 1), ('Ava', 1), ('Elisa', 1), ('Emir', 1), ('Kaya Olivia', 1), ('Luca', 1), ('Max', 1), ('Noah', 1), ('Nora', 1), ('Norman', 1), ('Oskar', 1), ('Petra', 1), ('Adam', 2), ('Benjamin', 2), ('Bille', 2), ('Carl', 2), ('Eleonora', 2), ('Emilie', 2), ('Freja', 2), ('Hannah', 2), ('Lou', 2), ('Pelle', 2), ('Tobias', 2), ('Una', 2)]
+[19:59:07.215] Minimum hosting count: 1
+[19:59:07.215] Children with min hosting: ['Anna', 'Ava', 'Elisa', 'Emir', 'Kaya Olivia', 'Luca', 'Max', 'Noah', 'Nora', 'Norman', 'Oskar', 'Petra']
+[19:59:07.215] 
+--- Calculating hosting break balance for iteration 7 ---
+[19:59:07.215] Current hosts: ['Anna', 'Norman', 'Max', 'Nora', 'Petra', 'Emir']
+[19:59:07.215] Complete hosting history: {'Lou': [1, 5], 'Ava': [1], 'Luca': [1], 'Max': [1, 7], 'Nora': [1, 7], 'Pelle': [1, 6], 'Elisa': [2], 'Oskar': [2], 'Freja': [2, 5], 'Carl': [2, 6], 'Eleonora': [2, 6], 'Adam': [2, 6], 'Norman': [3, 7], 'Noah': [3], 'Bille': [3, 5], 'Hannah': [3, 5], 'Benjamin': [3, 6], 'Emilie': [3, 5], 'Tobias': [4, 5], 'Una': [4, 6], 'Emir': [4, 7], 'Anna': [4, 7], 'Petra': [4, 7], 'Kaya Olivia': [4]}
+[19:59:07.215] All hosting breaks: [3, 5, 5, 4, 2, 3, 3, 3, 3, 1, 1, 2, 1, 0, 1, 2, 2, 2]
+[19:59:07.215] Average break length: 2.39
+[19:59:07.215] Host Anna: iterations [4, 7], latest break=2, deviation=-0.39, penalty=-0.15
+[19:59:07.215] Host Norman: iterations [3, 7], latest break=3, deviation=0.61, penalty=-0.37
+[19:59:07.215] Host Max: iterations [1, 7], latest break=5, deviation=2.61, penalty=-6.82
+[19:59:07.215] Host Nora: iterations [1, 7], latest break=5, deviation=2.61, penalty=-6.82
+[19:59:07.215] Host Petra: iterations [4, 7], latest break=2, deviation=-0.39, penalty=-0.15
+[19:59:07.215] Host Emir: iterations [4, 7], latest break=2, deviation=-0.39, penalty=-0.15
+[19:59:07.215] Total penalty: -14.46, Final break balance score: -2.41
+[19:59:07.215] Solution score breakdown for hosts ['Anna', 'Norman', 'Max', 'Nora', 'Petra', 'Emir']:
+[19:59:07.215]   Break balance contribution: -241049.38
+[19:59:07.215]   Total score: 5759777.56
+[19:59:07.215] 
+=== SOLVING ITERATION 8 ===
+[19:59:07.216] Children: ['Hannah', 'Ava', 'Kaya Olivia', 'Norman', 'Bille', 'Tobias', 'Benjamin', 'Emir', 'Petra', 'Una', 'Max', 'Oskar', 'Adam', 'Emilie', 'Carl', 'Luca', 'Nora', 'Lou', 'Freja', 'Elisa', 'Pelle', 'Anna', 'Eleonora', 'Noah']
+[19:59:07.216] Previous iterations: 7
+[19:59:07.216] 
+--- Selecting 6 hosts ---
+[19:59:07.216] Children by hosting count: [('Ava', 1), ('Elisa', 1), ('Kaya Olivia', 1), ('Luca', 1), ('Noah', 1), ('Oskar', 1), ('Adam', 2), ('Anna', 2), ('Benjamin', 2), ('Bille', 2), ('Carl', 2), ('Eleonora', 2), ('Emilie', 2), ('Emir', 2), ('Freja', 2), ('Hannah', 2), ('Lou', 2), ('Max', 2), ('Nora', 2), ('Norman', 2), ('Pelle', 2), ('Petra', 2), ('Tobias', 2), ('Una', 2)]
+[19:59:07.216] Minimum hosting count: 1
+[19:59:07.216] Children with min hosting: ['Ava', 'Elisa', 'Kaya Olivia', 'Luca', 'Noah', 'Oskar']
+[19:59:07.216] 
+--- Calculating hosting break balance for iteration 8 ---
+[19:59:07.216] Current hosts: ['Luca', 'Elisa', 'Ava', 'Noah', 'Kaya Olivia', 'Oskar']
+[19:59:07.216] Complete hosting history: {'Lou': [1, 5], 'Ava': [1, 8], 'Luca': [1, 8], 'Max': [1, 7], 'Nora': [1, 7], 'Pelle': [1, 6], 'Elisa': [2, 8], 'Oskar': [2, 8], 'Freja': [2, 5], 'Carl': [2, 6], 'Eleonora': [2, 6], 'Adam': [2, 6], 'Norman': [3, 7], 'Noah': [3, 8], 'Bille': [3, 5], 'Hannah': [3, 5], 'Benjamin': [3, 6], 'Emilie': [3, 5], 'Tobias': [4, 5], 'Una': [4, 6], 'Emir': [4, 7], 'Anna': [4, 7], 'Petra': [4, 7], 'Kaya Olivia': [4, 8]}
+[19:59:07.216] All hosting breaks: [3, 6, 6, 5, 5, 4, 5, 5, 2, 3, 3, 3, 3, 4, 1, 1, 2, 1, 0, 1, 2, 2, 2, 3]
+[19:59:07.216] Average break length: 3.00
+[19:59:07.216] Host Luca: iterations [1, 8], latest break=6, deviation=3.00, penalty=-9.00
+[19:59:07.216] Host Elisa: iterations [2, 8], latest break=5, deviation=2.00, penalty=-4.00
+[19:59:07.216] Host Ava: iterations [1, 8], latest break=6, deviation=3.00, penalty=-9.00
+[19:59:07.216] Host Noah: iterations [3, 8], latest break=4, deviation=1.00, penalty=-1.00
+[19:59:07.216] Host Kaya Olivia: iterations [4, 8], latest break=3, deviation=0.00, penalty=-0.00
+[19:59:07.216] Host Oskar: iterations [2, 8], latest break=5, deviation=2.00, penalty=-4.00
+[19:59:07.216] Total penalty: -27.00, Final break balance score: -4.50
+[19:59:07.216] Solution score breakdown for hosts ['Luca', 'Elisa', 'Ava', 'Noah', 'Kaya Olivia', 'Oskar']:
+[19:59:07.216]   Break balance contribution: -450000.00
+[19:59:07.216]   Total score: 5550825.70
+[19:59:07.216] 
+=== SOLVING ITERATION 9 ===
+[19:59:07.216] Children: ['Hannah', 'Ava', 'Kaya Olivia', 'Norman', 'Bille', 'Tobias', 'Benjamin', 'Emir', 'Petra', 'Una', 'Max', 'Oskar', 'Adam', 'Emilie', 'Carl', 'Luca', 'Nora', 'Lou', 'Freja', 'Elisa', 'Pelle', 'Anna', 'Eleonora', 'Noah']
+[19:59:07.216] Previous iterations: 8
+[19:59:07.216] 
+--- Selecting 6 hosts ---
+[19:59:07.216] Children by hosting count: [('Adam', 2), ('Anna', 2), ('Ava', 2), ('Benjamin', 2), ('Bille', 2), ('Carl', 2), ('Eleonora', 2), ('Elisa', 2), ('Emilie', 2), ('Emir', 2), ('Freja', 2), ('Hannah', 2), ('Kaya Olivia', 2), ('Lou', 2), ('Luca', 2), ('Max', 2), ('Noah', 2), ('Nora', 2), ('Norman', 2), ('Oskar', 2), ('Pelle', 2), ('Petra', 2), ('Tobias', 2), ('Una', 2)]
+[19:59:07.216] Minimum hosting count: 2
+[19:59:07.216] Children with min hosting: ['Adam', 'Anna', 'Ava', 'Benjamin', 'Bille', 'Carl', 'Eleonora', 'Elisa', 'Emilie', 'Emir', 'Freja', 'Hannah', 'Kaya Olivia', 'Lou', 'Luca', 'Max', 'Noah', 'Nora', 'Norman', 'Oskar', 'Pelle', 'Petra', 'Tobias', 'Una']
+[19:59:07.216] 
+--- Calculating hosting break balance for iteration 9 ---
+[19:59:07.216] Current hosts: ['Pelle', 'Emir', 'Bille', 'Anna', 'Elisa', 'Noah']
+[19:59:07.216] Complete hosting history: {'Lou': [1, 5], 'Ava': [1, 8], 'Luca': [1, 8], 'Max': [1, 7], 'Nora': [1, 7], 'Pelle': [1, 6, 9], 'Elisa': [2, 8, 9], 'Oskar': [2, 8], 'Freja': [2, 5], 'Carl': [2, 6], 'Eleonora': [2, 6], 'Adam': [2, 6], 'Norman': [3, 7], 'Noah': [3, 8, 9], 'Bille': [3, 5, 9], 'Hannah': [3, 5], 'Benjamin': [3, 6], 'Emilie': [3, 5], 'Tobias': [4, 5], 'Una': [4, 6], 'Emir': [4, 7, 9], 'Anna': [4, 7, 9], 'Petra': [4, 7], 'Kaya Olivia': [4, 8]}
+[19:59:07.216] All hosting breaks: [3, 6, 6, 5, 5, 4, 2, 5, 0, 5, 2, 3, 3, 3, 3, 4, 0, 1, 3, 1, 2, 1, 0, 1, 2, 1, 2, 1, 2, 3]
+[19:59:07.216] Average break length: 2.63
+[19:59:07.216] Host Pelle: iterations [1, 6, 9], latest break=2, deviation=-0.63, penalty=-0.40
+[19:59:07.216] Host Emir: iterations [4, 7, 9], latest break=1, deviation=-1.63, penalty=-2.67
+[19:59:07.216] Host Bille: iterations [3, 5, 9], latest break=3, deviation=0.37, penalty=-0.13
+[19:59:07.216] Host Anna: iterations [4, 7, 9], latest break=1, deviation=-1.63, penalty=-2.67
+[19:59:07.216] Host Elisa: iterations [2, 8, 9], latest break=0, deviation=-2.63, penalty=-6.93
+[19:59:07.216] Host Noah: iterations [3, 8, 9], latest break=0, deviation=-2.63, penalty=-6.93
+[19:59:07.216] Total penalty: -19.74, Final break balance score: -3.29
+[19:59:07.216] Solution score breakdown for hosts ['Pelle', 'Emir', 'Bille', 'Anna', 'Elisa', 'Noah']:
+[19:59:07.216]   Break balance contribution: -329000.00
+[19:59:07.216]   Total score: 5671822.50
