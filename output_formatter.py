@@ -59,40 +59,54 @@ class OutputFormatter:
                 f.write(f"\nHosting Statistics:\n")
                 f.write(f"  Min: {min(counts)}, Max: {max(counts)}, Avg: {sum(counts)/len(counts):.1f}\n\n")
                 
-                # Write meeting matrix
-                f.write("MEETING MATRIX\n")
+                # Write meeting details in vertical list format
+                f.write("MEETING DETAILS\n")
                 f.write("-" * 20 + "\n")
-                f.write("Shows how many times each pair of children have been in the same group:\n\n")
+                f.write("Shows how many times each child has been grouped with others:\n\n")
                 
-                # Create meeting matrix
-                child_names = [child.name for child in children]
-                child_names.sort()
+                # Sort children by name for consistent output
+                sorted_children = sorted(children, key=lambda x: x.name)
                 
-                meeting_matrix = {}
-                for child in children:
-                    meeting_matrix[child.name] = {}
-                    for other_name in child_names:
-                        if other_name == child.name:
-                            meeting_matrix[child.name][other_name] = '-'
-                        else:
+                for child in sorted_children:
+                    f.write(f"{child.name}:\n")
+                    
+                    # Create a list of meetings with counts
+                    meeting_counts = {}
+                    for other_child in children:
+                        if other_child.name != child.name:
+                            # Count how many times they were grouped together
                             count = 0
                             for meeting_name in child.meetings:
-                                if meeting_name == other_name:
+                                if meeting_name == other_child.name:
                                     count += 1
-                            meeting_matrix[child.name][other_name] = str(count)
-                
-                # Write matrix header
-                f.write("Child".ljust(15))
-                for name in child_names:
-                    f.write(f"{name[:8]:>8}")
-                f.write("\n")
-                
-                # Write matrix rows
-                for child_name in child_names:
-                    f.write(f"{child_name[:14]:<15}")
-                    for other_name in child_names:
-                        f.write(f"{meeting_matrix[child_name][other_name]:>8}")
-                    f.write("\n")
+                            if count > 0:
+                                meeting_counts[other_child.name] = count
+                    
+                    # Sort meetings by count (descending) then by name
+                    if meeting_counts:
+                        sorted_meetings = sorted(meeting_counts.items(), 
+                                               key=lambda x: (-x[1], x[0]))
+                        
+                        # Group by count for better readability
+                        current_count = None
+                        meeting_list = []
+                        
+                        for other_name, count in sorted_meetings:
+                            if count != current_count:
+                                if meeting_list and current_count is not None:
+                                    f.write(f"  {current_count} time{'s' if current_count > 1 else ''}: {', '.join(meeting_list)}\n")
+                                current_count = count
+                                meeting_list = [other_name]
+                            else:
+                                meeting_list.append(other_name)
+                        
+                        # Write the last group
+                        if meeting_list and current_count is not None:
+                            f.write(f"  {current_count} time{'s' if current_count > 1 else ''}: {', '.join(meeting_list)}\n")
+                    else:
+                        f.write("  No meetings recorded\n")
+                    
+                    f.write("\n")  # Empty line between children
                 
                 # Meeting statistics
                 f.write("\nMEETING STATISTICS\n")
