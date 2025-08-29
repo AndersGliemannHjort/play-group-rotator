@@ -167,58 +167,106 @@ class ConstraintSolver:
         selected_hosts = []
         
         if len(min_hosting_children) >= num_hosts:
-            # Randomize the order within same hosting count and break length groups
-            # to eliminate deterministic selection patterns
-            min_hosting_randomized = min_hosting_children.copy()
-            random.shuffle(min_hosting_randomized)
+            # BREAK-LENGTH AWARE RANDOMIZATION:
+            # Group children by break length, then randomize within each break length group
+            # This preserves break length priority while eliminating alphabetical bias
             
-            self.log_debug(f"\n🎲 Randomizing selection within min hosting group:")
-            original_min_order = [child.name for child, _ in min_hosting_children[:num_hosts+2]]
-            randomized_min_order = [child.name for child, _ in min_hosting_randomized[:num_hosts+2]]
-            self.log_debug(f"   Before shuffle: {original_min_order}")
-            self.log_debug(f"   After shuffle: {randomized_min_order}")
+            from collections import defaultdict
+            break_length_groups = defaultdict(list)
+            for child, break_len in min_hosting_children:
+                break_length_groups[break_len].append((child, break_len))
             
-            # Take the first num_hosts from randomized list
-            for i, (child, break_len) in enumerate(min_hosting_randomized):
+            # Sort break lengths (longest breaks first for priority)
+            sorted_break_lengths = sorted(break_length_groups.keys(), reverse=True)
+            
+            self.log_debug(f"\n🎲 BREAK-LENGTH AWARE RANDOMIZATION:")
+            self.log_debug(f"   Break length groups: {dict((k, len(v)) for k, v in break_length_groups.items())}")
+            
+            # Build selection list by break length priority, randomizing within each group
+            prioritized_candidates = []
+            for break_len in sorted_break_lengths:
+                group = break_length_groups[break_len].copy()
+                random.shuffle(group)  # Randomize within this break length group
+                
+                group_names = [child.name for child, _ in group]
+                self.log_debug(f"   Break length {break_len}: {len(group)} children → randomized: {group_names}")
+                prioritized_candidates.extend(group)
+            
+            # Select hosts from prioritized list (best break lengths first, randomized within each group)
+            for i, (child, break_len) in enumerate(prioritized_candidates):
                 if i < num_hosts:
                     selected_hosts.append(child)
                     consecutive = break_len == 0 and child.hosting_count > 0
                     reason = f"hosting={child.hosting_count}, break={break_len}"
                     if consecutive:
-                        reason += " (consecutive hosting)"
-                    self.log_debug(f"  ✓ {child.name}: {reason} (randomized selection)")
+                        reason += " (consecutive hosting - WARNING!)"
+                    else:
+                        reason += " (good break length)"
+                    self.log_debug(f"  ✓ {child.name}: {reason} (break-aware randomized selection)")
                 elif i < num_hosts + 3:  # Show a few rejected for context
-                    self.log_debug(f"  ✗ {child.name}: hosting={child.hosting_count}, break={break_len} (not selected in random draw)")
+                    self.log_debug(f"  ✗ {child.name}: hosting={child.hosting_count}, break={break_len} (not selected - lower break priority)")
         else:
-            # Take all min hosting children
+            # Take all min hosting children (apply same break-length aware logic)
+            from collections import defaultdict
+            break_length_groups = defaultdict(list)
             for child, break_len in min_hosting_children:
-                selected_hosts.append(child)
-                consecutive = break_len == 0 and child.hosting_count > 0
-                reason = f"hosting={child.hosting_count}, break={break_len}"
-                if consecutive:
-                    reason += " (consecutive hosting)"
-                self.log_debug(f"  ✓ {child.name}: {reason}")
+                break_length_groups[break_len].append((child, break_len))
             
-            remaining_needed = num_hosts - len(selected_hosts)
-            self.log_debug(f"\nNeed {remaining_needed} more hosts from higher hosting counts:")
+            sorted_break_lengths = sorted(break_length_groups.keys(), reverse=True)
             
-            # Get remaining candidates and randomize them too
-            remaining_candidates = [(child, break_len) for child, break_len in candidates 
-                                  if child not in selected_hosts]
-            random.shuffle(remaining_candidates)
-            
-            self.log_debug(f"🎲 Randomizing remaining candidate selection order")
-            
-            for i, (child, break_len) in enumerate(remaining_candidates):
-                if i < remaining_needed:
+            self.log_debug(f"🎲 Break-length aware selection for all min hosting children:")
+            for break_len in sorted_break_lengths:
+                group = break_length_groups[break_len].copy()
+                random.shuffle(group)
+                
+                for child, break_len in group:
                     selected_hosts.append(child)
                     consecutive = break_len == 0 and child.hosting_count > 0
                     reason = f"hosting={child.hosting_count}, break={break_len}"
                     if consecutive:
-                        reason += " (consecutive hosting)"
-                    self.log_debug(f"  ✓ {child.name}: {reason} (randomized selection)")
-                elif i < remaining_needed + 3:  # Show a few rejected for context
-                    self.log_debug(f"  ✗ {child.name}: hosting={child.hosting_count}, break={break_len} (not selected in random draw)")
+                        reason += " (consecutive hosting - WARNING!)"
+                    else:
+                        reason += " (good break length)"
+                    self.log_debug(f"  ✓ {child.name}: {reason} (break-aware selection)")
+            
+            remaining_needed = num_hosts - len(selected_hosts)
+            self.log_debug(f"\nNeed {remaining_needed} more hosts from higher hosting counts:")
+            
+            # Apply break-length aware randomization to remaining candidates too
+            remaining_candidates = [(child, break_len) for child, break_len in candidates 
+                                  if child not in selected_hosts]
+            
+            # Group remaining candidates by break length
+            remaining_break_groups = defaultdict(list)
+            for child, break_len in remaining_candidates:
+                remaining_break_groups[break_len].append((child, break_len))
+            
+            remaining_sorted_breaks = sorted(remaining_break_groups.keys(), reverse=True)
+            
+            self.log_debug(f"🎲 Break-length aware selection for remaining candidates")
+            selected_from_remaining = 0
+            
+            for break_len in remaining_sorted_breaks:
+                if selected_from_remaining >= remaining_needed:
+                    break
+                    
+                group = remaining_break_groups[break_len].copy()
+                random.shuffle(group)
+                
+                for child, break_len in group:
+                    if selected_from_remaining < remaining_needed:
+                        selected_hosts.append(child)
+                        consecutive = break_len == 0 and child.hosting_count > 0
+                        reason = f"hosting={child.hosting_count}, break={break_len}"
+                        if consecutive:
+                            reason += " (consecutive hosting - WARNING!)"
+                        else:
+                            reason += " (good break length)"
+                        self.log_debug(f"  ✓ {child.name}: {reason} (break-aware randomized selection)")
+                        selected_from_remaining += 1
+                    elif selected_from_remaining < remaining_needed + 3:  # Show a few rejected
+                        self.log_debug(f"  ✗ {child.name}: hosting={child.hosting_count}, break={break_len} (not selected - sufficient hosts found)")
+                        selected_from_remaining += 1  # Count for display limit
         
         # Log consecutive hosting prevention summary
         consecutive_count = sum(1 for host in selected_hosts 
