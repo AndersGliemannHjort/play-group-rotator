@@ -42,6 +42,7 @@ class ConstraintSolver:
     
     def solve(self, children, iteration_num, previous_iterations):
         """Solve the constraint satisfaction problem to create optimal groups."""
+        self.current_iteration = iteration_num  # Store for use in other methods
         self.log_debug(f"\n=== SOLVING ITERATION {iteration_num} ===")
         self.log_debug(f"Children: {[child.name for child in children]}")
         self.log_debug(f"Previous iterations: {len(previous_iterations)}")
@@ -103,49 +104,129 @@ class ConstraintSolver:
         return groups
     
     def _select_hosts(self, all_children, num_hosts):
-        """Select hosts fairly based on hosting counts."""
+        """Select hosts fairly based on hosting counts and break lengths."""
         self.log_debug(f"\n--- Selecting {num_hosts} hosts ---")
         
-        # Sort children by hosting count (ascending), then by name for consistency
-        candidates = sorted(all_children, key=lambda child: (child.hosting_count, child.name))
+        # Calculate break lengths for all children
+        self.log_debug(f"\n--- Calculating break lengths for iteration {self.current_iteration} ---")
+        children_with_breaks = []
+        for child in all_children:
+            break_length = self._calculate_break_length(child)
+            children_with_breaks.append((child, break_length))
+            if child.hosting_count == 0:
+                self.log_debug(f"  {child.name}: never hosted, break length = {break_length}")
+            else:
+                last_hosting = max(child.hosting_iterations) if child.hosting_iterations else 0
+                self.log_debug(f"  {child.name}: last hosted in iteration {last_hosting}, break length = {break_length}")
         
-        # Log hosting counts for all children
-        hosting_info = [(child.name, child.hosting_count) for child in candidates]
-        self.log_debug(f"Children by hosting count: {hosting_info}")
+        # Sort children by (hosting_count, -break_length, name) 
+        # -break_length so longer breaks come first (higher priority)
+        candidates = sorted(children_with_breaks, 
+                          key=lambda x: (x[0].hosting_count, -x[1], x[0].name))
+        
+        # Log the complete sorting criteria
+        self.log_debug(f"\n--- Children sorted by (hosting_count, break_length, name) ---")
+        for child, break_length in candidates:
+            self.log_debug(f"  {child.name}: hosting={child.hosting_count}, break={break_length}")
+        
+        # Log hosting counts for reference
+        hosting_info = [(child.name, child.hosting_count) for child, _ in candidates]
+        self.log_debug(f"\nChildren by hosting count: {hosting_info}")
         
         # Find the minimum hosting count
-        min_hosting = candidates[0].hosting_count
+        min_hosting = candidates[0][0].hosting_count
         self.log_debug(f"Minimum hosting count: {min_hosting}")
         
         # Get all children with the minimum hosting count
-        min_hosting_children = [child for child in candidates if child.hosting_count == min_hosting]
-        self.log_debug(f"Children with min hosting: {[child.name for child in min_hosting_children]}")
+        min_hosting_children = [(child, break_len) for child, break_len in candidates 
+                               if child.hosting_count == min_hosting]
+        self.log_debug(f"Children with min hosting: {[child.name for child, _ in min_hosting_children]}")
         
-        # If we have enough children with minimum hosting, select from them
+        # Select hosts with detailed reasoning
+        self.log_debug(f"\n--- Host selection with reasoning ---")
+        selected_hosts = []
+        
         if len(min_hosting_children) >= num_hosts:
-            random.shuffle(min_hosting_children)
-            return min_hosting_children[:num_hosts]
-        
-        # If not enough with minimum, take all min hosting children and select more
-        selected_hosts = min_hosting_children.copy()
-        remaining_needed = num_hosts - len(selected_hosts)
-        
-        # Get candidates with next lowest hosting count
-        next_hosting_candidates = [child for child in candidates 
-                                 if child.hosting_count == min_hosting + 1 
-                                 and child not in selected_hosts]
-        
-        if len(next_hosting_candidates) >= remaining_needed:
-            random.shuffle(next_hosting_candidates)
-            selected_hosts.extend(next_hosting_candidates[:remaining_needed])
+            # Take the first num_hosts from sorted list (best break lengths)
+            for i, (child, break_len) in enumerate(min_hosting_children):
+                if i < num_hosts:
+                    selected_hosts.append(child)
+                    consecutive = break_len == 0 and child.hosting_count > 0
+                    reason = f"hosting={child.hosting_count}, break={break_len}"
+                    if consecutive:
+                        reason += " (consecutive hosting)"
+                    self.log_debug(f"  ✓ {child.name}: {reason}")
+                else:
+                    self.log_debug(f"  ✗ {child.name}: hosting={child.hosting_count}, break={break_len} (not needed)")
         else:
-            # Keep expanding until we have enough hosts
-            remaining_candidates = [child for child in candidates if child not in selected_hosts]
-            random.shuffle(remaining_candidates)
-            selected_hosts.extend(remaining_candidates[:remaining_needed])
+            # Take all min hosting children
+            for child, break_len in min_hosting_children:
+                selected_hosts.append(child)
+                consecutive = break_len == 0 and child.hosting_count > 0
+                reason = f"hosting={child.hosting_count}, break={break_len}"
+                if consecutive:
+                    reason += " (consecutive hosting)"
+                self.log_debug(f"  ✓ {child.name}: {reason}")
+            
+            remaining_needed = num_hosts - len(selected_hosts)
+            self.log_debug(f"\nNeed {remaining_needed} more hosts from higher hosting counts:")
+            
+            # Get remaining candidates sorted by break length
+            remaining_candidates = [(child, break_len) for child, break_len in candidates 
+                                  if child not in selected_hosts]
+            
+            for i, (child, break_len) in enumerate(remaining_candidates):
+                if i < remaining_needed:
+                    selected_hosts.append(child)
+                    consecutive = break_len == 0 and child.hosting_count > 0
+                    reason = f"hosting={child.hosting_count}, break={break_len}"
+                    if consecutive:
+                        reason += " (consecutive hosting)"
+                    self.log_debug(f"  ✓ {child.name}: {reason}")
+                elif i < remaining_needed + 3:  # Show a few rejected for context
+                    self.log_debug(f"  ✗ {child.name}: hosting={child.hosting_count}, break={break_len} (not needed)")
         
-        self.log_debug(f"Selected hosts: {[host.name for host in selected_hosts]}")
+        # Log consecutive hosting prevention summary
+        consecutive_count = sum(1 for host in selected_hosts 
+                              if self._calculate_break_length(host) == 0 and host.hosting_count > 0)
+        
+        self.log_debug(f"\n--- Consecutive hosting summary ---")
+        if consecutive_count == 0:
+            self.log_debug("  No consecutive hosting detected ✓")
+        else:
+            self.log_debug(f"  {consecutive_count} consecutive hosting cases detected")
+            for host in selected_hosts:
+                if self._calculate_break_length(host) == 0 and host.hosting_count > 0:
+                    last_hosting = max(host.hosting_iterations)
+                    self.log_debug(f"    {host.name}: hosted in iteration {last_hosting}, now iteration {self.current_iteration}")
+        
+        # Log break distribution in final selection
+        break_lengths = [self._calculate_break_length(host) for host in selected_hosts]
+        break_lengths_filtered = [b for b in break_lengths if b < 999]  # Exclude first-time hosters
+        
+        self.log_debug(f"\n--- Selected hosts break summary ---")
+        if break_lengths_filtered:
+            avg_break = sum(break_lengths_filtered) / len(break_lengths_filtered)
+            min_break = min(break_lengths_filtered)
+            max_break = max(break_lengths_filtered) if max(break_lengths_filtered) < 999 else "N/A (first-time)"
+            self.log_debug(f"  Average break length: {avg_break:.1f} iterations")
+            self.log_debug(f"  Minimum break length: {min_break} iterations")
+            self.log_debug(f"  Maximum break length: {max_break}")
+        
+        first_time_count = sum(1 for b in break_lengths if b >= 999)
+        if first_time_count > 0:
+            self.log_debug(f"  First-time hosts: {first_time_count}")
+        
+        self.log_debug(f"\nFinal selected hosts: {[host.name for host in selected_hosts]}")
         return selected_hosts
+    
+    def _calculate_break_length(self, child):
+        """Calculate the number of iterations since the child last hosted."""
+        if not child.hosting_iterations:
+            return 999  # High value for children who have never hosted
+        
+        last_hosting_iteration = max(child.hosting_iterations)
+        return self.current_iteration - last_hosting_iteration - 1
     
     def _build_group_around_host(self, host, available_children):
         """Build a 2B+2G group around the given host."""
