@@ -144,9 +144,13 @@ class OutputFormatter:
                 # Meeting statistics
                 f.write("\nMEETING STATISTICS\n")
                 f.write("-" * 20 + "\n")
-                for child in children:
-                    meeting_count = len(child.meetings)
-                    f.write(f"{child.name:<20} met {meeting_count:>2} different children\n")
+                
+                # Create list of (child_name, meeting_count) and sort by count (desc) then name
+                meeting_stats = [(child.name, len(child.meetings)) for child in children]
+                meeting_stats.sort(key=lambda x: (-x[1], x[0]))
+                
+                for name, meeting_count in meeting_stats:
+                    f.write(f"{name:<20} met {meeting_count:>2} different children\n")
                 
                 # Overall meeting stats
                 meeting_counts = [len(child.meetings) for child in children]
