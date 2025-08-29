@@ -515,20 +515,27 @@ class ConstraintSolver:
         meeting_config = self.config.get('meeting_diversity', {
             'base_weight': 50,
             'penalty_exponent': 2.5,
-            'max_penalty_cap': 5000
+            'max_penalty_cap': 5000,
+            'same_gender_meeting_penalty_multiplier': 3.0
         })
         
         base_weight = meeting_config['base_weight']
         exponent = meeting_config['penalty_exponent']
         max_cap = meeting_config['max_penalty_cap']
+        same_gender_multiplier = meeting_config['same_gender_meeting_penalty_multiplier']
         
         self.log_debug(f"📋 Configuration loaded:")
         self.log_debug(f"   base_weight={base_weight}, exponent={exponent}, max_cap={max_cap}")
+        self.log_debug(f"   same_gender_multiplier={same_gender_multiplier}")
         self.log_debug(f"   Full config object: {meeting_config}")
         
         penalty_details = []
         pair_count = 0
         penalties_applied = 0
+        same_gender_penalties = 0
+        cross_gender_penalties = 0
+        same_gender_penalty_total = 0
+        cross_gender_penalty_total = 0
         
         # Calculate penalty for each pair in current groups
         for group_idx, group in enumerate(groups):
@@ -545,13 +552,30 @@ class ConstraintSolver:
                     meeting_count = 0
                     if child2.name in child1.meetings:
                         meeting_count = child1.meetings[child2.name]
+                    
+                    # Determine if this is a same-gender pairing
+                    same_gender = (child1.is_boy and child2.is_boy) or (child1.is_girl and child2.is_girl)
+                    gender_type = "same-gender" if same_gender else "cross-gender"
+                    gender_emoji = "👦👦" if (child1.is_boy and child2.is_boy) else "👧👧" if (child1.is_girl and child2.is_girl) else "👦👧"
                         
                     # Always log the pair, even if no previous meetings
                     if meeting_count == 0:
-                        self.log_debug(f"   👥 {child1.name}-{child2.name}: No previous meetings (penalty: 0)")
+                        self.log_debug(f"   👥 {child1.name}-{child2.name} ({gender_emoji} {gender_type}): No previous meetings (penalty: 0)")
                     else:
-                        # Apply progressive penalty: base_weight * (meeting_count ^ exponent)
-                        penalty = base_weight * (meeting_count ** exponent)
+                        # Calculate base penalty: base_weight * (meeting_count ^ exponent)
+                        base_penalty = base_weight * (meeting_count ** exponent)
+                        
+                        # Apply gender multiplier if same-gender
+                        if same_gender:
+                            penalty = base_penalty * same_gender_multiplier
+                            same_gender_penalties += 1
+                            same_gender_penalty_total += penalty
+                            multiplier_text = f" × {same_gender_multiplier} (same-gender)"
+                        else:
+                            penalty = base_penalty
+                            cross_gender_penalties += 1
+                            cross_gender_penalty_total += penalty
+                            multiplier_text = " (cross-gender)"
                         
                         # Apply cap if specified
                         original_penalty = penalty
@@ -561,23 +585,28 @@ class ConstraintSolver:
                         
                         total_penalty += penalty
                         penalties_applied += 1
-                        penalty_details.append((child1.name, child2.name, meeting_count, penalty))
+                        penalty_details.append((child1.name, child2.name, meeting_count, penalty, same_gender))
                         
-                        self.log_debug(f"   🚨 {child1.name}-{child2.name}: {meeting_count} meetings → penalty {penalty:.1f}")
+                        formula = f"{base_weight} × {meeting_count}^{exponent}{multiplier_text} = {penalty:.1f}"
+                        self.log_debug(f"   🚨 {child1.name}-{child2.name} ({gender_emoji} {gender_type}): {meeting_count} meetings → {formula}")
         
         # Summary logging
         self.log_debug(f"📈 PENALTY CALCULATION SUMMARY:")
         self.log_debug(f"   Total pairs evaluated: {pair_count}")
         self.log_debug(f"   Pairs with penalties: {penalties_applied}")
         self.log_debug(f"   Pairs without penalties: {pair_count - penalties_applied}")
+        self.log_debug(f"   Same-gender penalties: {same_gender_penalties} (total: {same_gender_penalty_total:.1f})")
+        self.log_debug(f"   Cross-gender penalties: {cross_gender_penalties} (total: {cross_gender_penalty_total:.1f})")
         
         if penalty_details:
             # Sort by penalty for better readability
             penalty_details.sort(key=lambda x: x[3], reverse=True)
             self.log_debug(f"🔥 TOP PENALTIES (sorted by severity):")
-            for child1, child2, count, penalty in penalty_details[:10]:  # Show top 10
-                formula = f"{base_weight} × {count}^{exponent} = {penalty:.1f}"
-                self.log_debug(f"   {child1}-{child2}: {count} meetings → {formula}")
+            for child1, child2, count, penalty, is_same_gender in penalty_details[:10]:  # Show top 10
+                gender_type = "same-gender" if is_same_gender else "cross-gender"
+                multiplier_part = f" × {same_gender_multiplier}" if is_same_gender else ""
+                formula = f"{base_weight} × {count}^{exponent}{multiplier_part} = {penalty:.1f}"
+                self.log_debug(f"   {child1}-{child2} ({gender_type}): {count} meetings → {formula}")
         else:
             self.log_debug("✅ No previous meetings found, no penalties applied")
         
