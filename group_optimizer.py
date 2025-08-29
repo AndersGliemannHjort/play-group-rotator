@@ -108,7 +108,11 @@ class GroupOptimizer:
             for i, child1 in enumerate(group.children):
                 for j, child2 in enumerate(group.children):
                     if i != j:
-                        child1.meetings.add(child2.name)
+                        # Increment meeting count for this pair
+                        if child2.name in child1.meetings:
+                            child1.meetings[child2.name] += 1
+                        else:
+                            child1.meetings[child2.name] = 1
     
     def _validate_groups(self, groups, iteration_num):
         """Validate that groups meet basic requirements."""

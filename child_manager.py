@@ -17,7 +17,7 @@ class Child:
         # Tracking data for optimization
         self.hosting_count = 0
         self.hosting_iterations = []  # List of iteration numbers when this child hosted
-        self.meetings = set()  # Set of other children this child has been grouped with
+        self.meetings = {}  # Dictionary of child names to meeting counts
     
     def __str__(self):
         return f"{self.name} ({'Girl' if self.is_girl else 'Boy'})"

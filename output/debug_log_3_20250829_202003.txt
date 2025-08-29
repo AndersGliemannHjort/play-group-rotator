@@ -1,0 +1,337 @@
+CONSTRAINT SOLVER DEBUG LOG
+==================================================
+
+[20:20:03.823] === ConstraintSolver Debug Log Started ===
+[20:20:03.823] Weights: {'gender_balance': 1000000, 'hosting_break_balance': 100000, 'host_rotation': 100, 'group_diversity': 50, 'host_fairness': 800, 'meeting_fairness': 10}
+[20:20:03.823] Constraints: {'target_boys_per_group': 2, 'target_girls_per_group': 2, 'max_hosting_difference': 1, 'max_meeting_difference': 2}
+[20:20:03.823] 
+=== SOLVING ITERATION 1 ===
+[20:20:03.823] Children: ['Hannah', 'Ava', 'Kaya Olivia', 'Norman', 'Bille', 'Tobias', 'Benjamin', 'Emir', 'Petra', 'Una', 'Max', 'Oskar', 'Adam', 'Emilie', 'Carl', 'Luca', 'Nora', 'Lou', 'Freja', 'Elisa', 'Pelle', 'Anna', 'Eleonora', 'Noah']
+[20:20:03.823] Previous iterations: 0
+[20:20:03.823] 
+--- Selecting 6 hosts ---
+[20:20:03.823] 
+--- Calculating break lengths for iteration 1 ---
+[20:20:03.823]   Norman: never hosted, break length = 999
+[20:20:03.823]   Bille: never hosted, break length = 999
+[20:20:03.823]   Tobias: never hosted, break length = 999
+[20:20:03.823]   Benjamin: never hosted, break length = 999
+[20:20:03.823]   Emir: never hosted, break length = 999
+[20:20:03.823]   Max: never hosted, break length = 999
+[20:20:03.823]   Oskar: never hosted, break length = 999
+[20:20:03.823]   Adam: never hosted, break length = 999
+[20:20:03.823]   Carl: never hosted, break length = 999
+[20:20:03.823]   Luca: never hosted, break length = 999
+[20:20:03.823]   Pelle: never hosted, break length = 999
+[20:20:03.823]   Noah: never hosted, break length = 999
+[20:20:03.823]   Hannah: never hosted, break length = 999
+[20:20:03.823]   Ava: never hosted, break length = 999
+[20:20:03.823]   Kaya Olivia: never hosted, break length = 999
+[20:20:03.823]   Petra: never hosted, break length = 999
+[20:20:03.823]   Una: never hosted, break length = 999
+[20:20:03.823]   Emilie: never hosted, break length = 999
+[20:20:03.823]   Nora: never hosted, break length = 999
+[20:20:03.823]   Lou: never hosted, break length = 999
+[20:20:03.823]   Freja: never hosted, break length = 999
+[20:20:03.823]   Elisa: never hosted, break length = 999
+[20:20:03.823]   Anna: never hosted, break length = 999
+[20:20:03.823]   Eleonora: never hosted, break length = 999
+[20:20:03.823] 
+--- Children sorted by (hosting_count, break_length, name) ---
+[20:20:03.823]   Adam: hosting=0, break=999
+[20:20:03.823]   Anna: hosting=0, break=999
+[20:20:03.823]   Ava: hosting=0, break=999
+[20:20:03.823]   Benjamin: hosting=0, break=999
+[20:20:03.823]   Bille: hosting=0, break=999
+[20:20:03.823]   Carl: hosting=0, break=999
+[20:20:03.823]   Eleonora: hosting=0, break=999
+[20:20:03.823]   Elisa: hosting=0, break=999
+[20:20:03.823]   Emilie: hosting=0, break=999
+[20:20:03.823]   Emir: hosting=0, break=999
+[20:20:03.823]   Freja: hosting=0, break=999
+[20:20:03.823]   Hannah: hosting=0, break=999
+[20:20:03.823]   Kaya Olivia: hosting=0, break=999
+[20:20:03.823]   Lou: hosting=0, break=999
+[20:20:03.823]   Luca: hosting=0, break=999
+[20:20:03.823]   Max: hosting=0, break=999
+[20:20:03.823]   Noah: hosting=0, break=999
+[20:20:03.823]   Nora: hosting=0, break=999
+[20:20:03.823]   Norman: hosting=0, break=999
+[20:20:03.823]   Oskar: hosting=0, break=999
+[20:20:03.823]   Pelle: hosting=0, break=999
+[20:20:03.823]   Petra: hosting=0, break=999
+[20:20:03.823]   Tobias: hosting=0, break=999
+[20:20:03.823]   Una: hosting=0, break=999
+[20:20:03.823] 
+Children by hosting count: [('Adam', 0), ('Anna', 0), ('Ava', 0), ('Benjamin', 0), ('Bille', 0), ('Carl', 0), ('Eleonora', 0), ('Elisa', 0), ('Emilie', 0), ('Emir', 0), ('Freja', 0), ('Hannah', 0), ('Kaya Olivia', 0), ('Lou', 0), ('Luca', 0), ('Max', 0), ('Noah', 0), ('Nora', 0), ('Norman', 0), ('Oskar', 0), ('Pelle', 0), ('Petra', 0), ('Tobias', 0), ('Una', 0)]
+[20:20:03.823] Minimum hosting count: 0
+[20:20:03.823] Children with min hosting: ['Adam', 'Anna', 'Ava', 'Benjamin', 'Bille', 'Carl', 'Eleonora', 'Elisa', 'Emilie', 'Emir', 'Freja', 'Hannah', 'Kaya Olivia', 'Lou', 'Luca', 'Max', 'Noah', 'Nora', 'Norman', 'Oskar', 'Pelle', 'Petra', 'Tobias', 'Una']
+[20:20:03.823] 
+--- Host selection with reasoning ---
+[20:20:03.823]   ✓ Adam: hosting=0, break=999
+[20:20:03.823]   ✓ Anna: hosting=0, break=999
+[20:20:03.823]   ✓ Ava: hosting=0, break=999
+[20:20:03.823]   ✓ Benjamin: hosting=0, break=999
+[20:20:03.823]   ✓ Bille: hosting=0, break=999
+[20:20:03.823]   ✓ Carl: hosting=0, break=999
+[20:20:03.823]   ✗ Eleonora: hosting=0, break=999 (not needed)
+[20:20:03.823]   ✗ Elisa: hosting=0, break=999 (not needed)
+[20:20:03.823]   ✗ Emilie: hosting=0, break=999 (not needed)
+[20:20:03.823]   ✗ Emir: hosting=0, break=999 (not needed)
+[20:20:03.823]   ✗ Freja: hosting=0, break=999 (not needed)
+[20:20:03.823]   ✗ Hannah: hosting=0, break=999 (not needed)
+[20:20:03.823]   ✗ Kaya Olivia: hosting=0, break=999 (not needed)
+[20:20:03.823]   ✗ Lou: hosting=0, break=999 (not needed)
+[20:20:03.823]   ✗ Luca: hosting=0, break=999 (not needed)
+[20:20:03.823]   ✗ Max: hosting=0, break=999 (not needed)
+[20:20:03.823]   ✗ Noah: hosting=0, break=999 (not needed)
+[20:20:03.823]   ✗ Nora: hosting=0, break=999 (not needed)
+[20:20:03.823]   ✗ Norman: hosting=0, break=999 (not needed)
+[20:20:03.823]   ✗ Oskar: hosting=0, break=999 (not needed)
+[20:20:03.823]   ✗ Pelle: hosting=0, break=999 (not needed)
+[20:20:03.823]   ✗ Petra: hosting=0, break=999 (not needed)
+[20:20:03.823]   ✗ Tobias: hosting=0, break=999 (not needed)
+[20:20:03.823]   ✗ Una: hosting=0, break=999 (not needed)
+[20:20:03.823] 
+--- Consecutive hosting summary ---
+[20:20:03.823]   No consecutive hosting detected ✓
+[20:20:03.823] 
+--- Selected hosts break summary ---
+[20:20:03.823]   First-time hosts: 6
+[20:20:03.823] 
+Final selected hosts: ['Adam', 'Anna', 'Ava', 'Benjamin', 'Bille', 'Carl']
+[20:20:03.823] 
+--- Comprehensive iteration validation ---
+[20:20:03.823]   Total children assigned: 24
+[20:20:03.824]   Expected total children: 24
+[20:20:03.824]   Group sizes: [4, 4, 4, 4, 4, 4]
+[20:20:03.824]   Size range: 4-4, average: 4.0
+[20:20:03.824]   ✓ Validation PASSED: All children assigned correctly
+[20:20:03.824]   Children assignment verification:
+[20:20:03.824]     Group 1: ['Adam', 'Noah', 'Elisa', 'Nora']
+[20:20:03.824]     Group 2: ['Anna', 'Luca', 'Max', 'Emilie']
+[20:20:03.824]     Group 3: ['Ava', 'Emir', 'Oskar', 'Lou']
+[20:20:03.824]     Group 4: ['Benjamin', 'Norman', 'Petra', 'Hannah']
+[20:20:03.824]     Group 5: ['Bille', 'Pelle', 'Eleonora', 'Kaya Olivia']
+[20:20:03.824]     Group 6: ['Carl', 'Tobias', 'Una', 'Freja']
+[20:20:03.824] Solution score breakdown for hosts ['Adam', 'Anna', 'Ava', 'Benjamin', 'Bille', 'Carl']:
+[20:20:03.824]   Break balance contribution: 0.00
+[20:20:03.824]   Total score: 6000810.00
+[20:20:03.824] 
+=== SOLVING ITERATION 2 ===
+[20:20:03.824] Children: ['Hannah', 'Ava', 'Kaya Olivia', 'Norman', 'Bille', 'Tobias', 'Benjamin', 'Emir', 'Petra', 'Una', 'Max', 'Oskar', 'Adam', 'Emilie', 'Carl', 'Luca', 'Nora', 'Lou', 'Freja', 'Elisa', 'Pelle', 'Anna', 'Eleonora', 'Noah']
+[20:20:03.824] Previous iterations: 1
+[20:20:03.824] 
+--- Selecting 6 hosts ---
+[20:20:03.824] 
+--- Calculating break lengths for iteration 2 ---
+[20:20:03.824]   Norman: never hosted, break length = 999
+[20:20:03.824]   Bille: last hosted in iteration 1, break length = 0
+[20:20:03.824]   Tobias: never hosted, break length = 999
+[20:20:03.824]   Benjamin: last hosted in iteration 1, break length = 0
+[20:20:03.824]   Emir: never hosted, break length = 999
+[20:20:03.824]   Max: never hosted, break length = 999
+[20:20:03.824]   Oskar: never hosted, break length = 999
+[20:20:03.824]   Adam: last hosted in iteration 1, break length = 0
+[20:20:03.824]   Carl: last hosted in iteration 1, break length = 0
+[20:20:03.824]   Luca: never hosted, break length = 999
+[20:20:03.824]   Pelle: never hosted, break length = 999
+[20:20:03.824]   Noah: never hosted, break length = 999
+[20:20:03.824]   Hannah: never hosted, break length = 999
+[20:20:03.824]   Ava: last hosted in iteration 1, break length = 0
+[20:20:03.824]   Kaya Olivia: never hosted, break length = 999
+[20:20:03.824]   Petra: never hosted, break length = 999
+[20:20:03.824]   Una: never hosted, break length = 999
+[20:20:03.824]   Emilie: never hosted, break length = 999
+[20:20:03.824]   Nora: never hosted, break length = 999
+[20:20:03.824]   Lou: never hosted, break length = 999
+[20:20:03.824]   Freja: never hosted, break length = 999
+[20:20:03.824]   Elisa: never hosted, break length = 999
+[20:20:03.824]   Anna: last hosted in iteration 1, break length = 0
+[20:20:03.824]   Eleonora: never hosted, break length = 999
+[20:20:03.824] 
+--- Children sorted by (hosting_count, break_length, name) ---
+[20:20:03.824]   Eleonora: hosting=0, break=999
+[20:20:03.824]   Elisa: hosting=0, break=999
+[20:20:03.824]   Emilie: hosting=0, break=999
+[20:20:03.824]   Emir: hosting=0, break=999
+[20:20:03.824]   Freja: hosting=0, break=999
+[20:20:03.824]   Hannah: hosting=0, break=999
+[20:20:03.824]   Kaya Olivia: hosting=0, break=999
+[20:20:03.824]   Lou: hosting=0, break=999
+[20:20:03.824]   Luca: hosting=0, break=999
+[20:20:03.824]   Max: hosting=0, break=999
+[20:20:03.824]   Noah: hosting=0, break=999
+[20:20:03.824]   Nora: hosting=0, break=999
+[20:20:03.824]   Norman: hosting=0, break=999
+[20:20:03.824]   Oskar: hosting=0, break=999
+[20:20:03.824]   Pelle: hosting=0, break=999
+[20:20:03.824]   Petra: hosting=0, break=999
+[20:20:03.824]   Tobias: hosting=0, break=999
+[20:20:03.824]   Una: hosting=0, break=999
+[20:20:03.824]   Adam: hosting=1, break=0
+[20:20:03.824]   Anna: hosting=1, break=0
+[20:20:03.824]   Ava: hosting=1, break=0
+[20:20:03.824]   Benjamin: hosting=1, break=0
+[20:20:03.824]   Bille: hosting=1, break=0
+[20:20:03.824]   Carl: hosting=1, break=0
+[20:20:03.824] 
+Children by hosting count: [('Eleonora', 0), ('Elisa', 0), ('Emilie', 0), ('Emir', 0), ('Freja', 0), ('Hannah', 0), ('Kaya Olivia', 0), ('Lou', 0), ('Luca', 0), ('Max', 0), ('Noah', 0), ('Nora', 0), ('Norman', 0), ('Oskar', 0), ('Pelle', 0), ('Petra', 0), ('Tobias', 0), ('Una', 0), ('Adam', 1), ('Anna', 1), ('Ava', 1), ('Benjamin', 1), ('Bille', 1), ('Carl', 1)]
+[20:20:03.824] Minimum hosting count: 0
+[20:20:03.824] Children with min hosting: ['Eleonora', 'Elisa', 'Emilie', 'Emir', 'Freja', 'Hannah', 'Kaya Olivia', 'Lou', 'Luca', 'Max', 'Noah', 'Nora', 'Norman', 'Oskar', 'Pelle', 'Petra', 'Tobias', 'Una']
+[20:20:03.824] 
+--- Host selection with reasoning ---
+[20:20:03.824]   ✓ Eleonora: hosting=0, break=999
+[20:20:03.824]   ✓ Elisa: hosting=0, break=999
+[20:20:03.824]   ✓ Emilie: hosting=0, break=999
+[20:20:03.824]   ✓ Emir: hosting=0, break=999
+[20:20:03.824]   ✓ Freja: hosting=0, break=999
+[20:20:03.824]   ✓ Hannah: hosting=0, break=999
+[20:20:03.824]   ✗ Kaya Olivia: hosting=0, break=999 (not needed)
+[20:20:03.824]   ✗ Lou: hosting=0, break=999 (not needed)
+[20:20:03.824]   ✗ Luca: hosting=0, break=999 (not needed)
+[20:20:03.824]   ✗ Max: hosting=0, break=999 (not needed)
+[20:20:03.824]   ✗ Noah: hosting=0, break=999 (not needed)
+[20:20:03.824]   ✗ Nora: hosting=0, break=999 (not needed)
+[20:20:03.824]   ✗ Norman: hosting=0, break=999 (not needed)
+[20:20:03.824]   ✗ Oskar: hosting=0, break=999 (not needed)
+[20:20:03.824]   ✗ Pelle: hosting=0, break=999 (not needed)
+[20:20:03.824]   ✗ Petra: hosting=0, break=999 (not needed)
+[20:20:03.824]   ✗ Tobias: hosting=0, break=999 (not needed)
+[20:20:03.824]   ✗ Una: hosting=0, break=999 (not needed)
+[20:20:03.824] 
+--- Consecutive hosting summary ---
+[20:20:03.824]   No consecutive hosting detected ✓
+[20:20:03.824] 
+--- Selected hosts break summary ---
+[20:20:03.824]   First-time hosts: 6
+[20:20:03.824] 
+Final selected hosts: ['Eleonora', 'Elisa', 'Emilie', 'Emir', 'Freja', 'Hannah']
+[20:20:03.824] 
+--- Comprehensive iteration validation ---
+[20:20:03.824]   Total children assigned: 24
+[20:20:03.824]   Expected total children: 24
+[20:20:03.824]   Group sizes: [4, 4, 4, 4, 4, 4]
+[20:20:03.824]   Size range: 4-4, average: 4.0
+[20:20:03.824]   ✓ Validation PASSED: All children assigned correctly
+[20:20:03.824]   Children assignment verification:
+[20:20:03.824]     Group 1: ['Eleonora', 'Bille', 'Norman', 'Kaya Olivia']
+[20:20:03.824]     Group 2: ['Elisa', 'Adam', 'Pelle', 'Petra']
+[20:20:03.824]     Group 3: ['Emilie', 'Carl', 'Benjamin', 'Lou']
+[20:20:03.824]     Group 4: ['Emir', 'Tobias', 'Una', 'Anna']
+[20:20:03.824]     Group 5: ['Freja', 'Noah', 'Luca', 'Ava']
+[20:20:03.824]     Group 6: ['Hannah', 'Oskar', 'Max', 'Nora']
+[20:20:03.824] 
+--- Calculating hosting break balance for iteration 2 ---
+[20:20:03.824] Current hosts: ['Eleonora', 'Elisa', 'Emilie', 'Emir', 'Freja', 'Hannah']
+[20:20:03.824] Complete hosting history: {'Adam': [1], 'Anna': [1], 'Ava': [1], 'Benjamin': [1], 'Bille': [1], 'Carl': [1], 'Eleonora': [2], 'Elisa': [2], 'Emilie': [2], 'Emir': [2], 'Freja': [2], 'Hannah': [2]}
+[20:20:03.824] No hosting breaks to evaluate yet
+[20:20:03.824] Solution score breakdown for hosts ['Eleonora', 'Elisa', 'Emilie', 'Emir', 'Freja', 'Hannah']:
+[20:20:03.824]   Break balance contribution: 0.00
+[20:20:03.824]   Total score: 6000949.72
+[20:20:03.824] 
+=== SOLVING ITERATION 3 ===
+[20:20:03.824] Children: ['Hannah', 'Ava', 'Kaya Olivia', 'Norman', 'Bille', 'Tobias', 'Benjamin', 'Emir', 'Petra', 'Una', 'Max', 'Oskar', 'Adam', 'Emilie', 'Carl', 'Luca', 'Nora', 'Lou', 'Freja', 'Elisa', 'Pelle', 'Anna', 'Eleonora', 'Noah']
+[20:20:03.824] Previous iterations: 2
+[20:20:03.824] 
+--- Selecting 6 hosts ---
+[20:20:03.824] 
+--- Calculating break lengths for iteration 3 ---
+[20:20:03.824]   Norman: never hosted, break length = 999
+[20:20:03.825]   Bille: last hosted in iteration 1, break length = 1
+[20:20:03.825]   Tobias: never hosted, break length = 999
+[20:20:03.825]   Benjamin: last hosted in iteration 1, break length = 1
+[20:20:03.825]   Emir: last hosted in iteration 2, break length = 0
+[20:20:03.825]   Max: never hosted, break length = 999
+[20:20:03.825]   Oskar: never hosted, break length = 999
+[20:20:03.825]   Adam: last hosted in iteration 1, break length = 1
+[20:20:03.825]   Carl: last hosted in iteration 1, break length = 1
+[20:20:03.825]   Luca: never hosted, break length = 999
+[20:20:03.825]   Pelle: never hosted, break length = 999
+[20:20:03.825]   Noah: never hosted, break length = 999
+[20:20:03.825]   Hannah: last hosted in iteration 2, break length = 0
+[20:20:03.825]   Ava: last hosted in iteration 1, break length = 1
+[20:20:03.825]   Kaya Olivia: never hosted, break length = 999
+[20:20:03.825]   Petra: never hosted, break length = 999
+[20:20:03.825]   Una: never hosted, break length = 999
+[20:20:03.825]   Emilie: last hosted in iteration 2, break length = 0
+[20:20:03.825]   Nora: never hosted, break length = 999
+[20:20:03.825]   Lou: never hosted, break length = 999
+[20:20:03.825]   Freja: last hosted in iteration 2, break length = 0
+[20:20:03.825]   Elisa: last hosted in iteration 2, break length = 0
+[20:20:03.825]   Anna: last hosted in iteration 1, break length = 1
+[20:20:03.825]   Eleonora: last hosted in iteration 2, break length = 0
+[20:20:03.825] 
+--- Children sorted by (hosting_count, break_length, name) ---
+[20:20:03.825]   Kaya Olivia: hosting=0, break=999
+[20:20:03.825]   Lou: hosting=0, break=999
+[20:20:03.825]   Luca: hosting=0, break=999
+[20:20:03.825]   Max: hosting=0, break=999
+[20:20:03.825]   Noah: hosting=0, break=999
+[20:20:03.825]   Nora: hosting=0, break=999
+[20:20:03.825]   Norman: hosting=0, break=999
+[20:20:03.825]   Oskar: hosting=0, break=999
+[20:20:03.825]   Pelle: hosting=0, break=999
+[20:20:03.825]   Petra: hosting=0, break=999
+[20:20:03.825]   Tobias: hosting=0, break=999
+[20:20:03.825]   Una: hosting=0, break=999
+[20:20:03.825]   Adam: hosting=1, break=1
+[20:20:03.825]   Anna: hosting=1, break=1
+[20:20:03.825]   Ava: hosting=1, break=1
+[20:20:03.825]   Benjamin: hosting=1, break=1
+[20:20:03.825]   Bille: hosting=1, break=1
+[20:20:03.825]   Carl: hosting=1, break=1
+[20:20:03.825]   Eleonora: hosting=1, break=0
+[20:20:03.825]   Elisa: hosting=1, break=0
+[20:20:03.825]   Emilie: hosting=1, break=0
+[20:20:03.825]   Emir: hosting=1, break=0
+[20:20:03.825]   Freja: hosting=1, break=0
+[20:20:03.825]   Hannah: hosting=1, break=0
+[20:20:03.825] 
+Children by hosting count: [('Kaya Olivia', 0), ('Lou', 0), ('Luca', 0), ('Max', 0), ('Noah', 0), ('Nora', 0), ('Norman', 0), ('Oskar', 0), ('Pelle', 0), ('Petra', 0), ('Tobias', 0), ('Una', 0), ('Adam', 1), ('Anna', 1), ('Ava', 1), ('Benjamin', 1), ('Bille', 1), ('Carl', 1), ('Eleonora', 1), ('Elisa', 1), ('Emilie', 1), ('Emir', 1), ('Freja', 1), ('Hannah', 1)]
+[20:20:03.825] Minimum hosting count: 0
+[20:20:03.825] Children with min hosting: ['Kaya Olivia', 'Lou', 'Luca', 'Max', 'Noah', 'Nora', 'Norman', 'Oskar', 'Pelle', 'Petra', 'Tobias', 'Una']
+[20:20:03.825] 
+--- Host selection with reasoning ---
+[20:20:03.825]   ✓ Kaya Olivia: hosting=0, break=999
+[20:20:03.825]   ✓ Lou: hosting=0, break=999
+[20:20:03.825]   ✓ Luca: hosting=0, break=999
+[20:20:03.825]   ✓ Max: hosting=0, break=999
+[20:20:03.825]   ✓ Noah: hosting=0, break=999
+[20:20:03.825]   ✓ Nora: hosting=0, break=999
+[20:20:03.825]   ✗ Norman: hosting=0, break=999 (not needed)
+[20:20:03.825]   ✗ Oskar: hosting=0, break=999 (not needed)
+[20:20:03.825]   ✗ Pelle: hosting=0, break=999 (not needed)
+[20:20:03.825]   ✗ Petra: hosting=0, break=999 (not needed)
+[20:20:03.825]   ✗ Tobias: hosting=0, break=999 (not needed)
+[20:20:03.825]   ✗ Una: hosting=0, break=999 (not needed)
+[20:20:03.825] 
+--- Consecutive hosting summary ---
+[20:20:03.825]   No consecutive hosting detected ✓
+[20:20:03.825] 
+--- Selected hosts break summary ---
+[20:20:03.825]   First-time hosts: 6
+[20:20:03.825] 
+Final selected hosts: ['Kaya Olivia', 'Lou', 'Luca', 'Max', 'Noah', 'Nora']
+[20:20:03.825] 
+--- Comprehensive iteration validation ---
+[20:20:03.825]   Total children assigned: 24
+[20:20:03.825]   Expected total children: 24
+[20:20:03.825]   Group sizes: [4, 4, 4, 4, 4, 4]
+[20:20:03.825]   Size range: 4-4, average: 4.0
+[20:20:03.825]   ✓ Validation PASSED: All children assigned correctly
+[20:20:03.825]   Children assignment verification:
+[20:20:03.825]     Group 1: ['Kaya Olivia', 'Norman', 'Oskar', 'Elisa']
+[20:20:03.825]     Group 2: ['Lou', 'Emir', 'Bille', 'Eleonora']
+[20:20:03.825]     Group 3: ['Luca', 'Benjamin', 'Anna', 'Freja']
+[20:20:03.825]     Group 4: ['Max', 'Tobias', 'Petra', 'Una']
+[20:20:03.825]     Group 5: ['Noah', 'Carl', 'Emilie', 'Ava']
+[20:20:03.825]     Group 6: ['Nora', 'Pelle', 'Adam', 'Hannah']
+[20:20:03.825] 
+--- Calculating hosting break balance for iteration 3 ---
+[20:20:03.825] Current hosts: ['Kaya Olivia', 'Lou', 'Luca', 'Max', 'Noah', 'Nora']
+[20:20:03.825] Complete hosting history: {'Adam': [1], 'Anna': [1], 'Ava': [1], 'Benjamin': [1], 'Bille': [1], 'Carl': [1], 'Eleonora': [2], 'Elisa': [2], 'Emilie': [2], 'Emir': [2], 'Freja': [2], 'Hannah': [2], 'Kaya Olivia': [3], 'Lou': [3], 'Luca': [3], 'Max': [3], 'Noah': [3], 'Nora': [3]}
+[20:20:03.825] No hosting breaks to evaluate yet
+[20:20:03.825] Solution score breakdown for hosts ['Kaya Olivia', 'Lou', 'Luca', 'Max', 'Noah', 'Nora']:
+[20:20:03.825]   Break balance contribution: 0.00
+[20:20:03.825]   Total score: 6000941.39

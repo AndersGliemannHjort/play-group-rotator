@@ -103,17 +103,8 @@ class OutputFormatter:
                 for child in sorted_children:
                     f.write(f"{child.name}:\n")
                     
-                    # Create a list of meetings with counts
-                    meeting_counts = {}
-                    for other_child in children:
-                        if other_child.name != child.name:
-                            # Count how many times they were grouped together
-                            count = 0
-                            for meeting_name in child.meetings:
-                                if meeting_name == other_child.name:
-                                    count += 1
-                            if count > 0:
-                                meeting_counts[other_child.name] = count
+                    # Get meeting counts (child.meetings is now a dictionary)
+                    meeting_counts = child.meetings.copy()
                     
                     # Sort meetings by count (descending) then by name
                     if meeting_counts:
