@@ -77,6 +77,16 @@ class GroupOptimizer:
             self.warnings.append(f"Iteration {iteration_num}: Could not satisfy all constraints")
             return None
         
+        # Additional high-level validation
+        total_children_in_groups = sum(len(group.children) for group in groups)
+        expected_total = len(children)
+        
+        if total_children_in_groups != expected_total:
+            error_msg = f"Critical error: Total children in groups ({total_children_in_groups}) != expected ({expected_total})"
+            self.warnings.append(f"Iteration {iteration_num}: {error_msg}")
+            print(f"ERROR: {error_msg}")
+            return None
+        
         # Update child statistics
         self._update_child_statistics(children, groups, iteration_num)
         

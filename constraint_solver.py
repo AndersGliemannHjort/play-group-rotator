@@ -101,6 +101,12 @@ class ConstraintSolver:
                 if child in remaining_children:
                     remaining_children.remove(child)
         
+        # Step 3: Comprehensive validation before returning solution
+        validation_result = self._validate_iteration_integrity(groups, all_children)
+        if not validation_result["valid"]:
+            self.log_debug(f"Validation failed: {validation_result['errors']}")
+            return None  # Invalid solution, reject it
+        
         return groups
     
     def _select_hosts(self, all_children, num_hosts):
@@ -227,6 +233,119 @@ class ConstraintSolver:
         
         last_hosting_iteration = max(child.hosting_iterations)
         return self.current_iteration - last_hosting_iteration - 1
+    
+    def _validate_iteration_integrity(self, groups, original_children):
+        """Comprehensive validation to ensure all children appear exactly once per iteration."""
+        self.log_debug(f"\n--- Comprehensive iteration validation ---")
+        
+        errors = []
+        warnings = []
+        
+        # Basic structure validation
+        if not groups:
+            errors.append("No groups generated")
+            return {"valid": False, "errors": errors, "warnings": warnings}
+        
+        if len(groups) != 6:
+            errors.append(f"Expected 6 groups, got {len(groups)}")
+        
+        # Collect all children from all groups
+        all_assigned_children = []
+        group_sizes = []
+        
+        for i, group in enumerate(groups):
+            if not group or not hasattr(group, 'children'):
+                errors.append(f"Group {i+1} is invalid or has no children attribute")
+                continue
+            
+            group_children = group.children if hasattr(group, 'children') else []
+            group_sizes.append(len(group_children))
+            all_assigned_children.extend(group_children)
+            
+            # Validate individual group size
+            if len(group_children) != 4:
+                errors.append(f"Group {i+1} has {len(group_children)} children, expected 4")
+            
+            # Validate group gender balance
+            boys_in_group = sum(1 for child in group_children if child.is_boy)
+            girls_in_group = sum(1 for child in group_children if child.is_girl)
+            
+            if boys_in_group != 2 or girls_in_group != 2:
+                warnings.append(f"Group {i+1} has {boys_in_group}B+{girls_in_group}G (expected 2B+2G)")
+        
+        # Check total children count
+        total_assigned = len(all_assigned_children)
+        expected_total = len(original_children)
+        
+        self.log_debug(f"  Total children assigned: {total_assigned}")
+        self.log_debug(f"  Expected total children: {expected_total}")
+        
+        if total_assigned != expected_total:
+            errors.append(f"Total assigned children ({total_assigned}) != expected ({expected_total})")
+        
+        # Check for duplicate children within iteration
+        assigned_names = [child.name for child in all_assigned_children]
+        unique_names = set(assigned_names)
+        
+        if len(assigned_names) != len(unique_names):
+            duplicates = [name for name in assigned_names if assigned_names.count(name) > 1]
+            errors.append(f"Duplicate children in iteration: {set(duplicates)}")
+            self.log_debug(f"  Duplicate children detected: {set(duplicates)}")
+        
+        # Check for missing children
+        original_names = set(child.name for child in original_children)
+        assigned_names_set = set(assigned_names)
+        
+        missing_children = original_names - assigned_names_set
+        extra_children = assigned_names_set - original_names
+        
+        if missing_children:
+            errors.append(f"Missing children: {missing_children}")
+            self.log_debug(f"  Missing children: {missing_children}")
+        
+        if extra_children:
+            errors.append(f"Unknown children assigned: {extra_children}")
+            self.log_debug(f"  Unknown children: {extra_children}")
+        
+        # Check group size distribution
+        if group_sizes:
+            min_size = min(group_sizes)
+            max_size = max(group_sizes)
+            avg_size = sum(group_sizes) / len(group_sizes)
+            
+            self.log_debug(f"  Group sizes: {group_sizes}")
+            self.log_debug(f"  Size range: {min_size}-{max_size}, average: {avg_size:.1f}")
+            
+            if min_size != 4 or max_size != 4:
+                warnings.append(f"Inconsistent group sizes: {group_sizes}")
+        
+        # Summary logging
+        if errors:
+            self.log_debug(f"  ✗ Validation FAILED: {len(errors)} error(s)")
+            for error in errors:
+                self.log_debug(f"    - {error}")
+        else:
+            self.log_debug(f"  ✓ Validation PASSED: All children assigned correctly")
+        
+        if warnings:
+            self.log_debug(f"  ⚠ Warnings: {len(warnings)}")
+            for warning in warnings:
+                self.log_debug(f"    - {warning}")
+        
+        # Detailed assignment verification (when successful)
+        if not errors:
+            self.log_debug(f"  Children assignment verification:")
+            for i, group in enumerate(groups):
+                child_names = [child.name for child in group.children]
+                self.log_debug(f"    Group {i+1}: {child_names}")
+        
+        return {
+            "valid": len(errors) == 0,
+            "errors": errors,
+            "warnings": warnings,
+            "total_assigned": total_assigned,
+            "group_sizes": group_sizes
+        }
     
     def _build_group_around_host(self, host, available_children):
         """Build a 2B+2G group around the given host."""

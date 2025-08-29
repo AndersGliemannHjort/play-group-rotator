@@ -1,0 +1,252 @@
+CHILD GROUP ROTATION SUMMARY REPORT
+==================================================
+
+Generated: 2025-08-29 20:14:26
+Total Iterations: 9
+Total Children: 24
+
+HOSTING COUNTS
+--------------------
+Adam                   3 times
+Anna                   3 times
+Ava                    3 times
+Benjamin               3 times
+Bille                  3 times
+Carl                   3 times
+Eleonora               2 times
+Elisa                  2 times
+Emilie                 2 times
+Emir                   2 times
+Freja                  2 times
+Hannah                 2 times
+Kaya Olivia            2 times
+Lou                    2 times
+Luca                   2 times
+Max                    2 times
+Noah                   2 times
+Nora                   2 times
+Norman                 2 times
+Oskar                  2 times
+Pelle                  2 times
+Petra                  2 times
+Tobias                 2 times
+Una                    2 times
+
+Hosting Statistics:
+  Min: 2, Max: 3, Avg: 2.2
+
+HOSTING PROXIMITY
+-----------------
+Shows minimum iterations between hosting periods (children who host multiple times):
+
+Adam                 3 iterations (hosted in: 1, 5, 9)
+Anna                 3 iterations (hosted in: 1, 5, 9)
+Ava                  3 iterations (hosted in: 1, 5, 9)
+Benjamin             3 iterations (hosted in: 1, 5, 9)
+Bille                3 iterations (hosted in: 1, 5, 9)
+Carl                 3 iterations (hosted in: 1, 5, 9)
+Eleonora             3 iterations (hosted in: 2, 6)
+Elisa                3 iterations (hosted in: 2, 6)
+Emilie               3 iterations (hosted in: 2, 6)
+Emir                 3 iterations (hosted in: 2, 6)
+Freja                3 iterations (hosted in: 2, 6)
+Hannah               3 iterations (hosted in: 2, 6)
+Kaya Olivia          3 iterations (hosted in: 3, 7)
+Lou                  3 iterations (hosted in: 3, 7)
+Luca                 3 iterations (hosted in: 3, 7)
+Max                  3 iterations (hosted in: 3, 7)
+Noah                 3 iterations (hosted in: 3, 7)
+Nora                 3 iterations (hosted in: 3, 7)
+Norman               3 iterations (hosted in: 4, 8)
+Oskar                3 iterations (hosted in: 4, 8)
+Pelle                3 iterations (hosted in: 4, 8)
+Petra                3 iterations (hosted in: 4, 8)
+Tobias               3 iterations (hosted in: 4, 8)
+Una                  3 iterations (hosted in: 4, 8)
+
+MEETING DETAILS
+--------------------
+Shows how many times each child has been grouped with others:
+
+Adam:
+  1 time: Ava, Benjamin, Bille, Eleonora, Elisa, Freja, Hannah, Kaya Olivia, Lou, Max, Norman, Oskar, Pelle, Petra, Tobias, Una
+
+Anna:
+  1 time: Benjamin, Carl, Emilie, Emir, Hannah, Kaya Olivia, Luca, Max, Noah, Nora, Norman, Oskar, Pelle, Petra, Tobias, Una
+
+Ava:
+  1 time: Adam, Benjamin, Carl, Eleonora, Elisa, Emir, Freja, Hannah, Luca, Max, Noah, Norman, Pelle, Petra, Tobias
+
+Benjamin:
+  1 time: Adam, Anna, Ava, Elisa, Emilie, Emir, Freja, Hannah, Kaya Olivia, Lou, Luca, Max, Noah, Nora, Norman, Pelle, Petra, Tobias
+
+Bille:
+  1 time: Adam, Eleonora, Elisa, Emilie, Emir, Freja, Hannah, Lou, Luca, Noah, Nora, Norman, Petra, Tobias, Una
+
+Carl:
+  1 time: Anna, Ava, Eleonora, Elisa, Emir, Freja, Hannah, Kaya Olivia, Lou, Max, Nora, Oskar, Pelle, Tobias, Una
+
+Eleonora:
+  1 time: Adam, Ava, Bille, Carl, Freja, Kaya Olivia, Lou, Luca, Max, Nora, Norman, Pelle, Tobias, Una
+
+Elisa:
+  1 time: Adam, Ava, Benjamin, Bille, Carl, Emilie, Emir, Freja, Hannah, Kaya Olivia, Lou, Luca, Nora, Oskar, Pelle, Tobias
+
+Emilie:
+  1 time: Anna, Benjamin, Bille, Elisa, Emir, Kaya Olivia, Luca, Max, Noah, Nora, Oskar, Petra, Tobias, Una
+
+Emir:
+  1 time: Anna, Ava, Benjamin, Bille, Carl, Elisa, Emilie, Hannah, Lou, Max, Noah, Nora, Oskar, Pelle, Petra, Tobias, Una
+
+Freja:
+  1 time: Adam, Ava, Benjamin, Bille, Carl, Eleonora, Elisa, Kaya Olivia, Lou, Luca, Max, Noah, Norman, Oskar, Petra, Tobias, Una
+
+Hannah:
+  1 time: Adam, Anna, Ava, Benjamin, Bille, Carl, Elisa, Emir, Kaya Olivia, Luca, Max, Noah, Nora, Norman, Tobias, Una
+
+Kaya Olivia:
+  1 time: Adam, Anna, Benjamin, Carl, Eleonora, Elisa, Emilie, Freja, Hannah, Noah, Norman, Oskar, Pelle, Tobias, Una
+
+Lou:
+  1 time: Adam, Benjamin, Bille, Carl, Eleonora, Elisa, Emir, Freja, Luca, Max, Noah, Nora, Norman, Oskar, Pelle, Tobias, Una
+
+Luca:
+  1 time: Anna, Ava, Benjamin, Bille, Eleonora, Elisa, Emilie, Freja, Hannah, Lou, Max, Nora, Norman, Oskar, Una
+
+Max:
+  1 time: Adam, Anna, Ava, Benjamin, Carl, Eleonora, Emilie, Emir, Freja, Hannah, Lou, Luca, Noah, Nora, Oskar, Pelle, Petra, Una
+
+Noah:
+  1 time: Anna, Ava, Benjamin, Bille, Emilie, Emir, Freja, Hannah, Kaya Olivia, Lou, Max, Nora, Norman, Oskar, Petra, Una
+
+Nora:
+  1 time: Anna, Benjamin, Bille, Carl, Eleonora, Elisa, Emilie, Emir, Hannah, Lou, Luca, Max, Noah, Norman, Oskar
+
+Norman:
+  1 time: Adam, Anna, Ava, Benjamin, Bille, Eleonora, Freja, Hannah, Kaya Olivia, Lou, Luca, Noah, Nora, Pelle, Una
+
+Oskar:
+  1 time: Adam, Anna, Carl, Elisa, Emilie, Emir, Freja, Kaya Olivia, Lou, Luca, Max, Noah, Nora, Petra
+
+Pelle:
+  1 time: Adam, Anna, Ava, Benjamin, Carl, Eleonora, Elisa, Emir, Kaya Olivia, Lou, Max, Norman, Tobias, Una
+
+Petra:
+  1 time: Adam, Anna, Ava, Benjamin, Bille, Emilie, Emir, Freja, Max, Noah, Oskar
+
+Tobias:
+  1 time: Adam, Anna, Ava, Benjamin, Bille, Carl, Eleonora, Elisa, Emilie, Emir, Freja, Hannah, Kaya Olivia, Lou, Pelle, Una
+
+Una:
+  1 time: Adam, Anna, Bille, Carl, Eleonora, Emilie, Emir, Freja, Hannah, Kaya Olivia, Lou, Luca, Max, Noah, Norman, Pelle, Tobias
+
+
+MEETING STATISTICS
+--------------------
+Benjamin             met 18 different children
+Max                  met 18 different children
+Emir                 met 17 different children
+Freja                met 17 different children
+Lou                  met 17 different children
+Una                  met 17 different children
+Adam                 met 16 different children
+Anna                 met 16 different children
+Elisa                met 16 different children
+Hannah               met 16 different children
+Noah                 met 16 different children
+Tobias               met 16 different children
+Ava                  met 15 different children
+Bille                met 15 different children
+Carl                 met 15 different children
+Kaya Olivia          met 15 different children
+Luca                 met 15 different children
+Nora                 met 15 different children
+Norman               met 15 different children
+Eleonora             met 14 different children
+Emilie               met 14 different children
+Oskar                met 14 different children
+Pelle                met 14 different children
+Petra                met 11 different children
+
+Meeting Statistics:
+  Min: 11, Max: 18, Avg: 15.5
+
+ITERATION DETAILS
+--------------------
+
+Iteration 1:
+  Group 1: Host=Adam         (2B, 2G) Members: Adam, Oskar, Elisa, Freja
+  Group 2: Host=Anna         (2B, 2G) Members: Anna, Luca, Max, Hannah
+  Group 3: Host=Ava          (2B, 2G) Members: Ava, Emir, Noah, Petra
+  Group 4: Host=Benjamin     (2B, 2G) Members: Benjamin, Tobias, Emilie, Kaya Olivia
+  Group 5: Host=Bille        (2B, 2G) Members: Bille, Norman, Nora, Lou
+  Group 6: Host=Carl         (2B, 2G) Members: Carl, Pelle, Una, Eleonora
+
+Iteration 2:
+  Group 1: Host=Eleonora     (2B, 2G) Members: Eleonora, Pelle, Norman, Ava
+  Group 2: Host=Elisa        (2B, 2G) Members: Elisa, Oskar, Carl, Kaya Olivia
+  Group 3: Host=Emilie       (2B, 2G) Members: Emilie, Bille, Noah, Petra
+  Group 4: Host=Emir         (2B, 2G) Members: Emir, Max, Lou, Nora
+  Group 5: Host=Freja        (2B, 2G) Members: Freja, Tobias, Adam, Una
+  Group 6: Host=Hannah       (2B, 2G) Members: Hannah, Benjamin, Luca, Anna
+
+Iteration 3:
+  Group 1: Host=Kaya Olivia  (2B, 2G) Members: Kaya Olivia, Tobias, Pelle, Una
+  Group 2: Host=Lou          (2B, 2G) Members: Lou, Norman, Adam, Eleonora
+  Group 3: Host=Luca         (2B, 2G) Members: Luca, Bille, Emilie, Elisa
+  Group 4: Host=Max          (2B, 2G) Members: Max, Benjamin, Ava, Freja
+  Group 5: Host=Noah         (2B, 2G) Members: Noah, Oskar, Petra, Anna
+  Group 6: Host=Nora         (2B, 2G) Members: Nora, Emir, Carl, Hannah
+
+Iteration 4:
+  Group 1: Host=Norman       (2B, 2G) Members: Norman, Luca, Eleonora, Freja
+  Group 2: Host=Oskar        (2B, 2G) Members: Oskar, Emir, Nora, Emilie
+  Group 3: Host=Pelle        (2B, 2G) Members: Pelle, Carl, Anna, Kaya Olivia
+  Group 4: Host=Petra        (2B, 2G) Members: Petra, Benjamin, Adam, Ava
+  Group 5: Host=Tobias       (2B, 2G) Members: Tobias, Bille, Elisa, Hannah
+  Group 6: Host=Una          (2B, 2G) Members: Una, Max, Noah, Lou
+
+Iteration 5:
+  Group 1: Host=Adam         (2B, 2G) Members: Adam, Norman, Hannah, Kaya Olivia
+  Group 2: Host=Anna         (2B, 2G) Members: Anna, Max, Oskar, Emilie
+  Group 3: Host=Ava          (2B, 2G) Members: Ava, Emir, Pelle, Elisa
+  Group 4: Host=Benjamin     (2B, 2G) Members: Benjamin, Noah, Freja, Petra
+  Group 5: Host=Bille        (2B, 2G) Members: Bille, Luca, Nora, Eleonora
+  Group 6: Host=Carl         (2B, 2G) Members: Carl, Tobias, Una, Lou
+
+Iteration 6:
+  Group 1: Host=Eleonora     (2B, 2G) Members: Eleonora, Max, Carl, Nora
+  Group 2: Host=Elisa        (2B, 2G) Members: Elisa, Pelle, Benjamin, Lou
+  Group 3: Host=Emilie       (2B, 2G) Members: Emilie, Noah, Oskar, Kaya Olivia
+  Group 4: Host=Emir         (2B, 2G) Members: Emir, Tobias, Anna, Una
+  Group 5: Host=Freja        (2B, 2G) Members: Freja, Bille, Adam, Petra
+  Group 6: Host=Hannah       (2B, 2G) Members: Hannah, Norman, Luca, Ava
+
+Iteration 7:
+  Group 1: Host=Kaya Olivia  (2B, 2G) Members: Kaya Olivia, Tobias, Pelle, Eleonora
+  Group 2: Host=Lou          (2B, 2G) Members: Lou, Oskar, Carl, Freja
+  Group 3: Host=Luca         (2B, 2G) Members: Luca, Bille, Una, Emilie
+  Group 4: Host=Max          (2B, 2G) Members: Max, Adam, Ava, Petra
+  Group 5: Host=Noah         (2B, 2G) Members: Noah, Norman, Anna, Hannah
+  Group 6: Host=Nora         (2B, 2G) Members: Nora, Benjamin, Emir, Elisa
+
+Iteration 8:
+  Group 1: Host=Norman       (2B, 2G) Members: Norman, Benjamin, Anna, Nora
+  Group 2: Host=Oskar        (2B, 2G) Members: Oskar, Luca, Lou, Freja
+  Group 3: Host=Pelle        (2B, 2G) Members: Pelle, Adam, Kaya Olivia, Elisa
+  Group 4: Host=Petra        (2B, 2G) Members: Petra, Noah, Max, Emilie
+  Group 5: Host=Tobias       (2B, 2G) Members: Tobias, Carl, Ava, Eleonora
+  Group 6: Host=Una          (2B, 2G) Members: Una, Bille, Emir, Hannah
+
+Iteration 9:
+  Group 1: Host=Adam         (2B, 2G) Members: Adam, Norman, Una, Lou
+  Group 2: Host=Anna         (2B, 2G) Members: Anna, Noah, Oskar, Nora
+  Group 3: Host=Ava          (2B, 2G) Members: Ava, Pelle, Max, Eleonora
+  Group 4: Host=Benjamin     (2B, 2G) Members: Benjamin, Luca, Hannah, Elisa
+  Group 5: Host=Bille        (2B, 2G) Members: Bille, Emir, Emilie, Petra
+  Group 6: Host=Carl         (2B, 2G) Members: Carl, Tobias, Freja, Kaya Olivia
+
+No warnings or constraint violations detected.
+
+==================================================
+End of Summary Report
