@@ -428,8 +428,11 @@ class ConstraintSolver:
             score += self.weights['host_rotation'] * (non_repeat_hosts / 6)
         
         # 3. Progressive meeting diversity penalty (exponentially punishes repeated pairings)
+        self.log_debug(f"\n=== PROGRESSIVE PENALTY CALCULATION (Iteration {iteration_num}) ===")
         progressive_penalty = self._calculate_progressive_meeting_penalty(groups)
+        self.log_debug(f"Progressive penalty calculated: {progressive_penalty:.2f}")
         score -= progressive_penalty  # Subtract penalty from score
+        self.log_debug(f"Score after penalty deduction: {score:.2f}")
         
         # 4. Host fairness with sharp penalty for hosting gaps >= 2
         hosting_counts = {}
@@ -465,10 +468,14 @@ class ConstraintSolver:
         
         # Log final score breakdown for this solution
         current_host_names = [group.host.name for group in groups if group.host]
-        self.log_debug(f"Solution score breakdown for hosts {current_host_names}:")
+        self.log_debug(f"\n=== FINAL SOLUTION SCORE BREAKDOWN ===")
+        self.log_debug(f"Solution for hosts: {current_host_names}")
+        self.log_debug(f"  Gender balance contribution: {score - (-progressive_penalty) - break_balance_contribution - meeting_contribution + progressive_penalty:.2f}")
         self.log_debug(f"  Progressive meeting penalty: -{progressive_penalty:.2f}")
         self.log_debug(f"  Break balance contribution: {break_balance_contribution:.2f}")
-        self.log_debug(f"  Total score: {score:.2f}")
+        self.log_debug(f"  Meeting fairness contribution: {meeting_contribution:.2f}")
+        self.log_debug(f"  TOTAL FINAL SCORE: {score:.2f}")
+        self.log_debug(f"=" * 50)
         
         return score
     
@@ -501,6 +508,9 @@ class ConstraintSolver:
         """Calculate progressive penalty based on how many times children have already met."""
         total_penalty = 0
         
+        self.log_debug(f"📊 PROGRESSIVE PENALTY METHOD CALLED")
+        self.log_debug(f"   Number of groups to evaluate: {len(groups)}")
+        
         # Get meeting diversity configuration
         meeting_config = self.config.get('meeting_diversity', {
             'base_weight': 50,
@@ -512,43 +522,67 @@ class ConstraintSolver:
         exponent = meeting_config['penalty_exponent']
         max_cap = meeting_config['max_penalty_cap']
         
-        self.log_debug(f"\n--- Progressive meeting diversity penalty calculation ---")
-        self.log_debug(f"Config: base_weight={base_weight}, exponent={exponent}, max_cap={max_cap}")
+        self.log_debug(f"📋 Configuration loaded:")
+        self.log_debug(f"   base_weight={base_weight}, exponent={exponent}, max_cap={max_cap}")
+        self.log_debug(f"   Full config object: {meeting_config}")
         
         penalty_details = []
+        pair_count = 0
+        penalties_applied = 0
         
         # Calculate penalty for each pair in current groups
         for group_idx, group in enumerate(groups):
+            group_children = [child.name for child in group.children]
+            self.log_debug(f"📦 Evaluating Group {group_idx + 1}: {group_children}")
+            
             for i in range(len(group.children)):
                 for j in range(i + 1, len(group.children)):
                     child1 = group.children[i]
                     child2 = group.children[j]
+                    pair_count += 1
                     
                     # Get current meeting count between these two children
                     meeting_count = 0
                     if child2.name in child1.meetings:
                         meeting_count = child1.meetings[child2.name]
-                    
-                    if meeting_count > 0:
+                        
+                    # Always log the pair, even if no previous meetings
+                    if meeting_count == 0:
+                        self.log_debug(f"   👥 {child1.name}-{child2.name}: No previous meetings (penalty: 0)")
+                    else:
                         # Apply progressive penalty: base_weight * (meeting_count ^ exponent)
                         penalty = base_weight * (meeting_count ** exponent)
                         
                         # Apply cap if specified
+                        original_penalty = penalty
                         if max_cap and penalty > max_cap:
                             penalty = max_cap
+                            self.log_debug(f"   ⚠️  Penalty capped: {original_penalty:.1f} → {penalty:.1f}")
                         
                         total_penalty += penalty
+                        penalties_applied += 1
                         penalty_details.append((child1.name, child2.name, meeting_count, penalty))
+                        
+                        self.log_debug(f"   🚨 {child1.name}-{child2.name}: {meeting_count} meetings → penalty {penalty:.1f}")
         
-        # Log penalty details
+        # Summary logging
+        self.log_debug(f"📈 PENALTY CALCULATION SUMMARY:")
+        self.log_debug(f"   Total pairs evaluated: {pair_count}")
+        self.log_debug(f"   Pairs with penalties: {penalties_applied}")
+        self.log_debug(f"   Pairs without penalties: {pair_count - penalties_applied}")
+        
         if penalty_details:
-            self.log_debug(f"Meeting penalty breakdown:")
-            for child1, child2, count, penalty in penalty_details:
-                self.log_debug(f"  {child1}-{child2}: {count} previous meetings → penalty {penalty:.1f}")
+            # Sort by penalty for better readability
+            penalty_details.sort(key=lambda x: x[3], reverse=True)
+            self.log_debug(f"🔥 TOP PENALTIES (sorted by severity):")
+            for child1, child2, count, penalty in penalty_details[:10]:  # Show top 10
+                formula = f"{base_weight} × {count}^{exponent} = {penalty:.1f}"
+                self.log_debug(f"   {child1}-{child2}: {count} meetings → {formula}")
         else:
-            self.log_debug("No previous meetings found, no penalties applied")
+            self.log_debug("✅ No previous meetings found, no penalties applied")
         
-        self.log_debug(f"Total progressive meeting penalty: {total_penalty:.1f}")
+        self.log_debug(f"💰 TOTAL PROGRESSIVE MEETING PENALTY: {total_penalty:.1f}")
+        self.log_debug(f"📊 PROGRESSIVE PENALTY CALCULATION COMPLETE")
         
         return total_penalty
     
