@@ -4,6 +4,8 @@ Implements backtracking algorithm with weighted constraint satisfaction.
 """
 
 import random
+import os
+from datetime import datetime
 from itertools import combinations
 
 
@@ -15,9 +17,35 @@ class ConstraintSolver:
         self.weights = config['weights']
         self.constraints = config['constraints']
         self.algorithm = config['algorithm']
+        
+        # Setup debug logging
+        self.debug_log = []
+        self.log_debug("=== ConstraintSolver Debug Log Started ===")
+        self.log_debug(f"Weights: {self.weights}")
+        self.log_debug(f"Constraints: {self.constraints}")
+    
+    def log_debug(self, message):
+        """Add a debug message to the log."""
+        timestamp = datetime.now().strftime('%H:%M:%S.%f')[:-3]
+        self.debug_log.append(f"[{timestamp}] {message}")
+    
+    def write_debug_log(self, filepath):
+        """Write the debug log to a file."""
+        try:
+            with open(filepath, 'w', encoding='utf-8') as f:
+                f.write("CONSTRAINT SOLVER DEBUG LOG\n")
+                f.write("=" * 50 + "\n\n")
+                for entry in self.debug_log:
+                    f.write(entry + "\n")
+        except Exception as e:
+            print(f"Warning: Could not write debug log: {e}")
     
     def solve(self, children, iteration_num, previous_iterations):
         """Solve the constraint satisfaction problem to create optimal groups."""
+        self.log_debug(f"\n=== SOLVING ITERATION {iteration_num} ===")
+        self.log_debug(f"Children: {[child.name for child in children]}")
+        self.log_debug(f"Previous iterations: {len(previous_iterations)}")
+        
         boys = [child for child in children if child.is_boy]
         girls = [child for child in children if child.is_girl]
         
@@ -76,14 +104,22 @@ class ConstraintSolver:
     
     def _select_hosts(self, all_children, num_hosts):
         """Select hosts fairly based on hosting counts."""
+        self.log_debug(f"\n--- Selecting {num_hosts} hosts ---")
+        
         # Sort children by hosting count (ascending), then by name for consistency
         candidates = sorted(all_children, key=lambda child: (child.hosting_count, child.name))
         
+        # Log hosting counts for all children
+        hosting_info = [(child.name, child.hosting_count) for child in candidates]
+        self.log_debug(f"Children by hosting count: {hosting_info}")
+        
         # Find the minimum hosting count
         min_hosting = candidates[0].hosting_count
+        self.log_debug(f"Minimum hosting count: {min_hosting}")
         
         # Get all children with the minimum hosting count
         min_hosting_children = [child for child in candidates if child.hosting_count == min_hosting]
+        self.log_debug(f"Children with min hosting: {[child.name for child in min_hosting_children]}")
         
         # If we have enough children with minimum hosting, select from them
         if len(min_hosting_children) >= num_hosts:
@@ -108,6 +144,7 @@ class ConstraintSolver:
             random.shuffle(remaining_candidates)
             selected_hosts.extend(remaining_candidates[:remaining_needed])
         
+        self.log_debug(f"Selected hosts: {[host.name for host in selected_hosts]}")
         return selected_hosts
     
     def _build_group_around_host(self, host, available_children):
@@ -216,13 +253,22 @@ class ConstraintSolver:
                 score += self.weights['host_fairness'] * fairness
         
         # 5. Hosting break balance (minimize consecutive hosting)
+        break_balance_contribution = 0
         if iteration_num > 1:
             break_balance_score = self._calculate_hosting_break_balance(groups, iteration_num, previous_iterations)
-            score += self.weights['hosting_break_balance'] * break_balance_score
+            break_balance_contribution = self.weights['hosting_break_balance'] * break_balance_score
+            score += break_balance_contribution
         
         # 6. Meeting fairness
         meeting_fairness = self._calculate_meeting_fairness(groups)
-        score += self.weights['meeting_fairness'] * meeting_fairness
+        meeting_contribution = self.weights['meeting_fairness'] * meeting_fairness
+        score += meeting_contribution
+        
+        # Log final score breakdown for this solution
+        current_host_names = [group.host.name for group in groups if group.host]
+        self.log_debug(f"Solution score breakdown for hosts {current_host_names}:")
+        self.log_debug(f"  Break balance contribution: {break_balance_contribution:.2f}")
+        self.log_debug(f"  Total score: {score:.2f}")
         
         return score
     
@@ -275,7 +321,10 @@ class ConstraintSolver:
     
     def _calculate_hosting_break_balance(self, groups, iteration_num, previous_iterations):
         """Calculate hosting break balance score using squared deviation penalty."""
+        self.log_debug(f"\n--- Calculating hosting break balance for iteration {iteration_num} ---")
+        
         if iteration_num <= 1:
+            self.log_debug("Skipping break balance for iteration 1")
             return 0.0
         
         # Get current hosts in this iteration
@@ -284,7 +333,10 @@ class ConstraintSolver:
             if group.host:
                 current_hosts.append(group.host)
         
+        self.log_debug(f"Current hosts: {[host.name for host in current_hosts]}")
+        
         if not current_hosts:
+            self.log_debug("No hosts found, returning 0.0")
             return 0.0
         
         # Calculate hosting breaks for children who have hosted multiple times
@@ -308,6 +360,8 @@ class ConstraintSolver:
                 all_children_hosting[host.name] = []
             all_children_hosting[host.name].append(iteration_num)
         
+        self.log_debug(f"Complete hosting history: {all_children_hosting}")
+        
         # Calculate breaks for children with multiple hostings
         for child_name, hosting_iterations in all_children_hosting.items():
             if len(hosting_iterations) > 1:
@@ -317,10 +371,13 @@ class ConstraintSolver:
                     all_hosting_breaks.append(break_length)
         
         if not all_hosting_breaks:
+            self.log_debug("No hosting breaks to evaluate yet")
             return 0.0  # No breaks to evaluate yet
         
         # Calculate average break length
         average_break = sum(all_hosting_breaks) / len(all_hosting_breaks)
+        self.log_debug(f"All hosting breaks: {all_hosting_breaks}")
+        self.log_debug(f"Average break length: {average_break:.2f}")
         
         # Calculate penalty for current hosts' new breaks
         total_penalty = 0.0
@@ -335,9 +392,16 @@ class ConstraintSolver:
                 deviation = latest_break - average_break
                 penalty = -(deviation ** 2)
                 total_penalty += penalty
+                
+                self.log_debug(f"Host {host.name}: iterations {sorted_iterations}, latest break={latest_break}, deviation={deviation:.2f}, penalty={penalty:.2f}")
+            else:
+                self.log_debug(f"Host {host.name}: only hosted once, no penalty")
+        
+        final_score = total_penalty / len(current_hosts) if current_hosts else 0.0
+        self.log_debug(f"Total penalty: {total_penalty:.2f}, Final break balance score: {final_score:.2f}")
         
         # Normalize by number of current hosts
-        return total_penalty / len(current_hosts) if current_hosts else 0.0
+        return final_score
     
     def _get_perfect_score(self):
         """Calculate the theoretical perfect score."""

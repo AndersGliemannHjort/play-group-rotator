@@ -109,7 +109,7 @@ def main():
         # Generate summary report
         summary_filename = f"Summary_{args.number_of_iterations}_{timestamp}.txt"
         summary_filepath = os.path.join(output_directory, summary_filename)
-        formatter.write_summary_file(children, all_iterations, summary_filepath, optimizer.warnings)
+        formatter.write_summary_file(children, all_iterations, summary_filepath, optimizer.warnings, optimizer.solver)
         
         print(f"\nOutput files generated:")
         print(f"  Groups: {group_filepath}")

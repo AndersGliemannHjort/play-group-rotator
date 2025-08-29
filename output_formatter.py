@@ -29,7 +29,7 @@ class OutputFormatter:
         except Exception as e:
             raise Exception(f"Error writing groups file: {e}")
     
-    def write_summary_file(self, children, all_iterations, filepath, warnings):
+    def write_summary_file(self, children, all_iterations, filepath, warnings, debug_log=None):
         """Write detailed summary report."""
         try:
             with open(filepath, 'w', encoding='utf-8') as f:
@@ -186,6 +186,12 @@ class OutputFormatter:
                 f.write("End of Summary Report\n")
             
             print(f"Summary file written: {filepath}")
+            
+            # Write debug log if provided
+            if debug_log:
+                debug_filepath = filepath.replace('Summary_', 'debug_log_').replace('.txt', '.txt')
+                debug_log.write_debug_log(debug_filepath)
+                print(f"Debug file written: {debug_filepath}")
             
         except Exception as e:
             raise Exception(f"Error writing summary file: {e}")
