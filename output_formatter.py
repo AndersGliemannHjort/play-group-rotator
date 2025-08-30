@@ -105,6 +105,9 @@ class OutputFormatter:
                     "- Perfect gender balance (2 boys + 2 girls) in every group\n"
                 )
                 f.write(
+                    "- Girls will tend to have more reoccuring meetings with the same boys than the same girls, and vice versa\n"
+                )
+                f.write(
                     "- Fair hosting distribution (max difference of 1 hosting between any two children)\n"
                 )
                 f.write(
@@ -269,42 +272,53 @@ class OutputFormatter:
                     f.write(f"{child_name}:\n")
 
                     # Get meeting counts from NEW iterations statistics
-                    new_meeting_counts = meeting_matrix[child_name].copy() if child_name in meeting_matrix else {}
-                    
+                    new_meeting_counts = meeting_matrix[child_name].copy(
+                    ) if child_name in meeting_matrix else {}
+
                     # Get meeting counts from ALL iterations (including past)
                     # Find the child object to get complete meeting history
-                    child_obj = next((c for c in children if c.name == child_name), None)
-                    all_meeting_counts = child_obj.meetings.copy() if child_obj else {}
+                    child_obj = next(
+                        (c for c in children if c.name == child_name), None)
+                    all_meeting_counts = child_obj.meetings.copy(
+                    ) if child_obj else {}
 
                     # Write NEW iterations meetings
                     f.write("  NEW iterations:\n")
                     if new_meeting_counts:
-                        sorted_new_meetings = sorted(new_meeting_counts.items(), key=lambda x: (-x[1], x[0]))
+                        sorted_new_meetings = sorted(
+                            new_meeting_counts.items(),
+                            key=lambda x: (-x[1], x[0]))
                         new_groups = {}
                         for other_name, count in sorted_new_meetings:
                             if count not in new_groups:
                                 new_groups[count] = []
                             new_groups[count].append(other_name)
-                        
+
                         for count in sorted(new_groups.keys(), reverse=True):
                             names_list = ', '.join(sorted(new_groups[count]))
-                            f.write(f"  {count} time{'s' if count > 1 else ''}: {names_list}\n")
+                            f.write(
+                                f"  {count} time{'s' if count > 1 else ''}: {names_list}\n"
+                            )
                     else:
                         f.write("  No meetings recorded\n")
 
                     # Write ALL iterations meetings
                     f.write("  \n  ALL iterations:\n")
                     if all_meeting_counts:
-                        sorted_all_meetings = sorted(all_meeting_counts.items(), key=lambda x: (-x[1], x[0]))
+                        sorted_all_meetings = sorted(
+                            all_meeting_counts.items(),
+                            key=lambda x: (-x[1], x[0]))
                         all_groups = {}
                         for other_name, count in sorted_all_meetings:
                             if count not in all_groups:
                                 all_groups[count] = []
                             all_groups[count].append(other_name)
-                        
+
                         for count in sorted(all_groups.keys(), reverse=True):
                             names_list = ', '.join(sorted(all_groups[count]))
-                            f.write(f"  {count} time{'s' if count > 1 else ''}: {names_list}\n")
+                            f.write(
+                                f"  {count} time{'s' if count > 1 else ''}: {names_list}\n"
+                            )
                     else:
                         f.write("  No meetings recorded\n")
 
