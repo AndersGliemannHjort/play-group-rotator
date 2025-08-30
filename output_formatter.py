@@ -78,10 +78,10 @@ class OutputFormatter:
                     "multiple competing goals. The system prioritizes constraints in a specific\n"
                 )
                 f.write(
-                    "hierarchy, with gender balance as the primary requirement, followed by fair\n"
+                    "hierarchy, with gender balance as the absolute requirement, followed by\n"
                 )
                 f.write(
-                    "hosting rotation, meeting diversity, and social mixing preferences.\n\n"
+                    "hosting fairness, meeting diversity, and break prevention.\n\n"
                 )
 
                 f.write("Constraint Hierarchy (in order of importance):\n")
@@ -92,15 +92,11 @@ class OutputFormatter:
                     "2. Hosting Fairness (High): Children should host approximately equal numbers of times\n"
                 )
                 f.write(
-                    "3. Break Prevention (High): No child should host in consecutive iterations\n"
+                    "3. Meeting Diversity (High): Children should meet different people when possible\n"
                 )
                 f.write(
-                    "4. Meeting Diversity (Medium): Children should meet different people when possible\n"
+                    "4. Break Prevention (Medium): Discourages consecutive hosting periods\n\n"
                 )
-                f.write(
-                    "5. Same-Gender Mixing (Medium): Repeated same-gender meetings are discouraged\n"
-                )
-                f.write("   more than cross-gender repetition\n\n")
 
                 f.write("Expected Outcomes Due to Mathematical Reality:\n\n")
 
@@ -112,49 +108,64 @@ class OutputFormatter:
                     "- Fair hosting distribution (max difference of 1 hosting between any two children)\n"
                 )
                 f.write(
-                    "- No consecutive hosting periods (minimum 3-iteration breaks achieved)\n"
+                    "- Good host rotation (break prevention naturally prevents consecutive hosting)\n"
+                )
+                f.write(
+                    "- Good meeting diversity with minimal repeated groupings\n"
                 )
                 f.write(
                     "- Randomized selection eliminating alphabetical bias\n\n")
 
                 f.write("⚠️ What You May Sometimes See:\n")
                 f.write(
-                    "- Some children meeting 4-5 times across multiple iterations\n"
+                    "- Some children meeting 2-3 times across multiple iterations\n"
                 )
                 f.write(
-                    "- Cross-gender repeated meetings preferred over same-gender repetition\n"
+                    "- Occasional repeated triplets (same 3 children grouped together multiple times)\n"
                 )
                 f.write(
-                    "- Certain pairings appearing more frequently due to hosting schedule constraints\n\n"
+                    "- Occasional 2-iteration hosting breaks (instead of ideal 3+ iterations)\n"
+                )
+                f.write(
+                    "- Minor variations in hosting schedules to optimize meeting diversity\n\n"
                 )
 
-                f.write("Why Repeated Meetings Occur:\n")
+                f.write("Why Trade-offs Occur:\n")
                 f.write(
-                    "With 24 children forming 6 groups over multiple iterations, some meeting\n"
+                    "With 24 children forming 6 groups over multiple iterations, perfect optimization\n"
                 )
                 f.write(
-                    "repetition is mathematically inevitable. The system minimizes this repetition\n"
+                    "of all constraints simultaneously is mathematically impossible. The system\n"
                 )
                 f.write(
-                    "wherever possible, but will always choose repeated meetings over gender\n"
+                    "prioritizes constraints based on importance:\n\n"
                 )
                 f.write(
-                    "imbalance. Children who host in the same iteration cycles are more likely to\n"
+                    "- Gender balance is NEVER compromised\n"
                 )
                 f.write(
-                    "be grouped together due to the fairness constraints.\n\n")
+                    "- Hosting fairness takes precedence over other patterns\n"
+                )
+                f.write(
+                    "- Meeting diversity may require flexible hosting schedules\n"
+                )
+                f.write(
+                    "- Break lengths yield when necessary for higher priorities\n\n"
+                )
 
-                f.write("Understanding the Trade-offs:\n")
+                f.write("Understanding the Algorithm's Approach:\n")
                 f.write(
-                    "The algorithm represents optimal solutions given the constraint priorities.\n"
+                    "The system represents optimal solutions given the constraint priorities.\n"
                 )
                 f.write(
-                    "Higher meeting repetition in some pairs reflects the system successfully\n"
+                    "When conflicts arise between different goals, the algorithm will sacrifice\n"
                 )
                 f.write(
-                    "maintaining more critical requirements (gender balance, hosting fairness)\n"
+                    "lower-priority constraints to maintain the most important requirements,\n"
                 )
-                f.write("while minimizing less critical violations.\n\n")
+                f.write(
+                    "always ensuring gender balance while maximizing overall fairness and diversity.\n\n"
+                )
                 f.write("=" * 50 + "\n\n")
 
                 # Get statistics for new iterations only
