@@ -241,7 +241,7 @@ class OutputFormatter:
                         iteration_list = ", ".join(map(str, iterations))
                         break_text = "iteration" if min_break == 1 else "iterations"
                         f.write(
-                            f"{name:<20} {min_break} {break_text} (hosted in: {iteration_list})\n"
+                            f"{name:<20} {min_break} {break_text} (will host in: {iteration_list})\n"
                         )
                 else:
                     f.write("No children hosted multiple times.\n")
