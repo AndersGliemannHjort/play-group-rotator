@@ -120,7 +120,17 @@ class OutputFormatter:
                                       key=lambda x: (-x[1], x[0]))
                 
                 for name, count in sorted_hosting:
-                    f.write(f"{name:<20} {count:>3} times\n")
+                    # Get historical total from child object
+                    total_count = None
+                    for child in children:
+                        if child.name == name:
+                            total_count = child.hosting_count
+                            break
+                    
+                    if total_count is not None and past_iteration_count > 0:
+                        f.write(f"{name:<20} {count:>3} times ({total_count} total across all iterations)\n")
+                    else:
+                        f.write(f"{name:<20} {count:>3} times\n")
                 
                 # Hosting statistics
                 counts = list(hosting_counts.values())
