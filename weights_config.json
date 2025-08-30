@@ -20,6 +20,12 @@
         "max_penalty_cap": 20000,
         "triplet_penalty_multiplier": 10.0
     },
+    "hosting_break_penalties": {
+        "break_0_penalty": -1000,
+        "break_1_penalty": -500,
+        "break_2_penalty": -50,
+        "break_3_plus_penalty": 0
+    },
     "constraints": {
         "target_boys_per_group": 2,
         "target_girls_per_group": 2,

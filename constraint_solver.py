@@ -168,15 +168,17 @@ class ConstraintSolver:
                 last_hosting = max(child.hosting_iterations) if child.hosting_iterations else 0
                 self.log_debug(f"  {child.name}: last hosted in iteration {last_hosting}, break length = {break_length}")
         
-        # Sort children by (hosting_count, -break_length) WITHOUT name tiebreaker
+        # Sort children by (hosting_count, break_penalty) WITHOUT name tiebreaker
         # This ensures randomized order is preserved when other criteria are equal
+        # Break penalty creates flexible scoring: 0-1 breaks heavily penalized, 2 breaks discouraged, 3+ breaks preferred
         candidates = sorted(children_with_breaks, 
-                          key=lambda x: (x[0].hosting_count, -x[1]))
+                          key=lambda x: (x[0].hosting_count, -self._calculate_break_penalty(x[1])))
         
         # Log the complete sorting criteria
-        self.log_debug(f"\n--- Children sorted by (hosting_count, break_length) with randomized tiebreaking ---")
+        self.log_debug(f"\n--- Children sorted by (hosting_count, break_penalty) with randomized tiebreaking ---")
         for child, break_length in candidates:
-            self.log_debug(f"  {child.name}: hosting={child.hosting_count}, break={break_length}")
+            break_penalty = self._calculate_break_penalty(break_length)
+            self.log_debug(f"  {child.name}: hosting={child.hosting_count}, break={break_length}, penalty={break_penalty}")
         
         # Log hosting counts for reference
         hosting_info = [(child.name, child.hosting_count) for child, _ in candidates]
@@ -196,29 +198,30 @@ class ConstraintSolver:
         selected_hosts = []
         
         if len(min_hosting_children) >= num_hosts:
-            # BREAK-LENGTH AWARE RANDOMIZATION:
-            # Group children by break length, then randomize within each break length group
-            # This preserves break length priority while eliminating alphabetical bias
+            # BREAK-PENALTY AWARE RANDOMIZATION:
+            # Group children by break penalty score, then randomize within each penalty group
+            # This preserves break penalty priority while eliminating alphabetical bias
             
             from collections import defaultdict
-            break_length_groups = defaultdict(list)
+            break_penalty_groups = defaultdict(list)
             for child, break_len in min_hosting_children:
-                break_length_groups[break_len].append((child, break_len))
+                penalty_score = self._calculate_break_penalty(break_len)
+                break_penalty_groups[penalty_score].append((child, break_len))
             
-            # Sort break lengths (longest breaks first for priority)
-            sorted_break_lengths = sorted(break_length_groups.keys(), reverse=True)
+            # Sort penalty scores (highest scores first - remember penalties are negative, so highest = least negative)
+            sorted_penalty_scores = sorted(break_penalty_groups.keys(), reverse=True)
             
-            self.log_debug(f"\n🎲 BREAK-LENGTH AWARE RANDOMIZATION:")
-            self.log_debug(f"   Break length groups: {dict((k, len(v)) for k, v in break_length_groups.items())}")
+            self.log_debug(f"\n🎲 BREAK-PENALTY AWARE RANDOMIZATION:")
+            self.log_debug(f"   Break penalty groups: {dict((k, len(v)) for k, v in break_penalty_groups.items())}")
             
-            # Build selection list by break length priority, randomizing within each group
+            # Build selection list by break penalty priority, randomizing within each group
             prioritized_candidates = []
-            for break_len in sorted_break_lengths:
-                group = break_length_groups[break_len].copy()
-                random.shuffle(group)  # Randomize within this break length group
+            for penalty_score in sorted_penalty_scores:
+                group = break_penalty_groups[penalty_score].copy()
+                random.shuffle(group)  # Randomize within this penalty group
                 
                 group_names = [child.name for child, _ in group]
-                self.log_debug(f"   Break length {break_len}: {len(group)} children → randomized: {group_names}")
+                self.log_debug(f"   Penalty score {penalty_score}: {len(group)} children → randomized: {group_names}")
                 prioritized_candidates.extend(group)
             
             # Select hosts from prioritized list (best break lengths first, randomized within each group)
@@ -235,63 +238,65 @@ class ConstraintSolver:
                 elif i < num_hosts + 3:  # Show a few rejected for context
                     self.log_debug(f"  ✗ {child.name}: hosting={child.hosting_count}, break={break_len} (not selected - lower break priority)")
         else:
-            # Take all min hosting children (apply same break-length aware logic)
+            # Take all min hosting children (apply same break-penalty aware logic)
             from collections import defaultdict
-            break_length_groups = defaultdict(list)
+            break_penalty_groups = defaultdict(list)
             for child, break_len in min_hosting_children:
-                break_length_groups[break_len].append((child, break_len))
+                penalty_score = self._calculate_break_penalty(break_len)
+                break_penalty_groups[penalty_score].append((child, break_len))
             
-            sorted_break_lengths = sorted(break_length_groups.keys(), reverse=True)
+            sorted_penalty_scores = sorted(break_penalty_groups.keys(), reverse=True)
             
-            self.log_debug(f"🎲 Break-length aware selection for all min hosting children:")
-            for break_len in sorted_break_lengths:
-                group = break_length_groups[break_len].copy()
+            self.log_debug(f"🎲 Break-penalty aware selection for all min hosting children:")
+            for penalty_score in sorted_penalty_scores:
+                group = break_penalty_groups[penalty_score].copy()
                 random.shuffle(group)
                 
                 for child, break_len in group:
                     selected_hosts.append(child)
                     consecutive = break_len == 0 and child.hosting_count > 0
-                    reason = f"hosting={child.hosting_count}, break={break_len}"
+                    reason = f"hosting={child.hosting_count}, break={break_len}, penalty={penalty_score}"
                     if consecutive:
                         reason += " (consecutive hosting - WARNING!)"
                     else:
                         reason += " (good break length)"
-                    self.log_debug(f"  ✓ {child.name}: {reason} (break-aware selection)")
+                    self.log_debug(f"  ✓ {child.name}: {reason} (break-penalty aware selection)")
             
             remaining_needed = num_hosts - len(selected_hosts)
             self.log_debug(f"\nNeed {remaining_needed} more hosts from higher hosting counts:")
             
-            # Apply break-length aware randomization to remaining candidates too
+            # Apply break-penalty aware randomization to remaining candidates too
             remaining_candidates = [(child, break_len) for child, break_len in candidates 
                                   if child not in selected_hosts]
             
-            # Group remaining candidates by break length
-            remaining_break_groups = defaultdict(list)
+            # Group remaining candidates by break penalty
+            remaining_penalty_groups = defaultdict(list)
             for child, break_len in remaining_candidates:
-                remaining_break_groups[break_len].append((child, break_len))
+                penalty_score = self._calculate_break_penalty(break_len)
+                remaining_penalty_groups[penalty_score].append((child, break_len))
             
-            remaining_sorted_breaks = sorted(remaining_break_groups.keys(), reverse=True)
+            remaining_sorted_penalties = sorted(remaining_penalty_groups.keys(), reverse=True)
             
-            self.log_debug(f"🎲 Break-length aware selection for remaining candidates")
+            self.log_debug(f"🎲 Break-penalty aware selection for remaining candidates")
             selected_from_remaining = 0
             
-            for break_len in remaining_sorted_breaks:
+            for penalty_score in remaining_sorted_penalties:
                 if selected_from_remaining >= remaining_needed:
                     break
                     
-                group = remaining_break_groups[break_len].copy()
+                group = remaining_penalty_groups[penalty_score].copy()
                 random.shuffle(group)
                 
                 for child, break_len in group:
                     if selected_from_remaining < remaining_needed:
                         selected_hosts.append(child)
                         consecutive = break_len == 0 and child.hosting_count > 0
-                        reason = f"hosting={child.hosting_count}, break={break_len}"
+                        reason = f"hosting={child.hosting_count}, break={break_len}, penalty={penalty_score}"
                         if consecutive:
                             reason += " (consecutive hosting - WARNING!)"
                         else:
                             reason += " (good break length)"
-                        self.log_debug(f"  ✓ {child.name}: {reason} (break-aware randomized selection)")
+                        self.log_debug(f"  ✓ {child.name}: {reason} (break-penalty aware randomized selection)")
                         selected_from_remaining += 1
                     elif selected_from_remaining < remaining_needed + 3:  # Show a few rejected
                         self.log_debug(f"  ✗ {child.name}: hosting={child.hosting_count}, break={break_len} (not selected - sufficient hosts found)")
@@ -338,6 +343,24 @@ class ConstraintSolver:
         
         last_hosting_iteration = max(child.hosting_iterations)
         return self.current_iteration - last_hosting_iteration - 1
+    
+    def _calculate_break_penalty(self, break_length):
+        """Calculate graduated penalty based on break length."""
+        break_config = self.config.get('hosting_break_penalties', {
+            'break_0_penalty': -1000,
+            'break_1_penalty': -500,
+            'break_2_penalty': -50,
+            'break_3_plus_penalty': 0
+        })
+        
+        if break_length == 0:
+            return break_config['break_0_penalty']
+        elif break_length == 1:
+            return break_config['break_1_penalty']
+        elif break_length == 2:
+            return break_config['break_2_penalty']
+        else:  # break_length >= 3
+            return break_config['break_3_plus_penalty']
     
     def _validate_iteration_integrity(self, groups, original_children):
         """Comprehensive validation to ensure all children appear exactly once per iteration."""
