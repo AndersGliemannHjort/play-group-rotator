@@ -277,7 +277,7 @@ class OutputFormatter:
                     all_meeting_counts = child_obj.meetings.copy() if child_obj else {}
 
                     # Write NEW iterations meetings
-                    f.write("  NEW iterations: ")
+                    f.write("  NEW iterations:\n")
                     if new_meeting_counts:
                         sorted_new_meetings = sorted(new_meeting_counts.items(), key=lambda x: (-x[1], x[0]))
                         new_groups = {}
@@ -286,16 +286,14 @@ class OutputFormatter:
                                 new_groups[count] = []
                             new_groups[count].append(other_name)
                         
-                        new_parts = []
                         for count in sorted(new_groups.keys(), reverse=True):
                             names_list = ', '.join(sorted(new_groups[count]))
-                            new_parts.append(f"{count} time{'s' if count > 1 else ''}: {names_list}")
-                        f.write('; '.join(new_parts) + "\n")
+                            f.write(f"  {count} time{'s' if count > 1 else ''}: {names_list}\n")
                     else:
-                        f.write("No meetings recorded\n")
+                        f.write("  No meetings recorded\n")
 
                     # Write ALL iterations meetings
-                    f.write("  ALL iterations: ")
+                    f.write("  \n  ALL iterations:\n")
                     if all_meeting_counts:
                         sorted_all_meetings = sorted(all_meeting_counts.items(), key=lambda x: (-x[1], x[0]))
                         all_groups = {}
@@ -304,13 +302,11 @@ class OutputFormatter:
                                 all_groups[count] = []
                             all_groups[count].append(other_name)
                         
-                        all_parts = []
                         for count in sorted(all_groups.keys(), reverse=True):
                             names_list = ', '.join(sorted(all_groups[count]))
-                            all_parts.append(f"{count} time{'s' if count > 1 else ''}: {names_list}")
-                        f.write('; '.join(all_parts) + "\n")
+                            f.write(f"  {count} time{'s' if count > 1 else ''}: {names_list}\n")
                     else:
-                        f.write("No meetings recorded\n")
+                        f.write("  No meetings recorded\n")
 
                     f.write("\n")  # Empty line between children
 
