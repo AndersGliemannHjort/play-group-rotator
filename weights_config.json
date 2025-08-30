@@ -10,7 +10,7 @@
     "meeting_diversity": {
         "base_weight": 200,
         "penalty_exponent": 3.0,
-        "max_penalty_cap": 5000,
+        "max_penalty_cap": 15000,
         "same_gender_meeting_penalty_multiplier": 3.0
     },
     "triplet_diversity": {
