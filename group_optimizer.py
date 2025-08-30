@@ -139,6 +139,12 @@ class GroupOptimizer:
         
         return True
     
+    def process_past_iterations(self, children, past_iterations):
+        """Process past iterations to update child statistics and tracking data."""
+        for iteration_num, groups in enumerate(past_iterations, 1):
+            # Update child statistics for this past iteration
+            self._update_child_statistics(children, groups, iteration_num)
+    
     def get_statistics(self, children):
         """Get statistics about hosting and meetings for all children."""
         stats = {

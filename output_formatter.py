@@ -10,12 +10,17 @@ from datetime import datetime
 class OutputFormatter:
     """Formats and writes output files for group iterations and summaries."""
     
-    def write_groups_file(self, all_iterations, filepath):
+    def write_groups_file(self, all_iterations, filepath, past_iteration_count=0):
         """Write groups output file with comma-separated format."""
         try:
             with open(filepath, 'w', encoding='utf-8') as f:
+                # Add header if there are past iterations
+                if past_iteration_count > 0:
+                    f.write(f"Based on {past_iteration_count} previous iteration(s)\n\n")
+                
                 for iteration_num, groups in enumerate(all_iterations, 1):
-                    f.write(f"=== ITERATION {iteration_num} ===\n")
+                    absolute_iteration_num = past_iteration_count + iteration_num
+                    f.write(f"=== ITERATION {absolute_iteration_num} ===\n")
                     
                     for group_num, group in enumerate(groups, 1):
                         # Write children names separated by commas with spaces
@@ -29,7 +34,7 @@ class OutputFormatter:
         except Exception as e:
             raise Exception(f"Error writing groups file: {e}")
     
-    def write_summary_file(self, children, all_iterations, filepath, warnings, debug_log=None):
+    def write_summary_file(self, children, all_iterations, filepath, warnings, debug_log=None, past_iteration_count=0):
         """Write detailed summary report."""
         try:
             with open(filepath, 'w', encoding='utf-8') as f:
@@ -37,7 +42,12 @@ class OutputFormatter:
                 f.write("=" * 50 + "\n\n")
                 
                 f.write(f"Generated: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}\n")
-                f.write(f"Total Iterations: {len(all_iterations)}\n")
+                if past_iteration_count > 0:
+                    f.write(f"Past Iterations: {past_iteration_count}\n")
+                    f.write(f"New Iterations: {len(all_iterations)}\n")
+                    f.write(f"Total Iterations: {past_iteration_count + len(all_iterations)}\n")
+                else:
+                    f.write(f"Total Iterations: {len(all_iterations)}\n")
                 f.write(f"Total Children: {len(children)}\n\n")
                 
                 # Add algorithm overview section
