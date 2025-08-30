@@ -535,9 +535,16 @@ class ConstraintSolver:
         # 3. Progressive meeting diversity penalty (exponentially punishes repeated pairings)
         self.log_debug(f"\n=== PROGRESSIVE PENALTY CALCULATION (Iteration {iteration_num}) ===")
         progressive_penalty = self._calculate_progressive_meeting_penalty(groups)
-        self.log_debug(f"Progressive penalty calculated: {progressive_penalty:.2f}")
+        self.log_debug(f"Progressive pair penalty calculated: {progressive_penalty:.2f}")
         score -= progressive_penalty  # Subtract penalty from score
-        self.log_debug(f"Score after penalty deduction: {score:.2f}")
+        
+        # 3.5. Triplet diversity penalty (heavily punish repeated triplet formations)
+        self.log_debug(f"\n=== TRIPLET PENALTY CALCULATION (Iteration {iteration_num}) ===")
+        triplet_penalty = self._calculate_triplet_penalty(groups)
+        self.log_debug(f"Triplet penalty calculated: {triplet_penalty:.2f}")
+        score -= triplet_penalty  # Subtract triplet penalty from score
+        
+        self.log_debug(f"Score after both penalties: {score:.2f}")
         
         # 4. Host fairness with sharp penalty for hosting gaps >= 2
         hosting_counts = {}
@@ -575,8 +582,9 @@ class ConstraintSolver:
         current_host_names = [group.host.name for group in groups if group.host]
         self.log_debug(f"\n=== FINAL SOLUTION SCORE BREAKDOWN ===")
         self.log_debug(f"Solution for hosts: {current_host_names}")
-        self.log_debug(f"  Gender balance contribution: {score - (-progressive_penalty) - break_balance_contribution - meeting_contribution + progressive_penalty:.2f}")
-        self.log_debug(f"  Progressive meeting penalty: -{progressive_penalty:.2f}")
+        self.log_debug(f"  Gender balance contribution: {score - (-progressive_penalty) - (-triplet_penalty) - break_balance_contribution - meeting_contribution + progressive_penalty + triplet_penalty:.2f}")
+        self.log_debug(f"  Progressive pair penalty: -{progressive_penalty:.2f}")
+        self.log_debug(f"  Triplet penalty: -{triplet_penalty:.2f}")
         self.log_debug(f"  Break balance contribution: {break_balance_contribution:.2f}")
         self.log_debug(f"  Meeting fairness contribution: {meeting_contribution:.2f}")
         self.log_debug(f"  TOTAL FINAL SCORE: {score:.2f}")
@@ -826,6 +834,82 @@ class ConstraintSolver:
         # Normalize by number of current hosts
         return final_score
     
+    def _calculate_triplet_penalty(self, groups):
+        """Calculate progressive penalty for repeated triplet combinations."""
+        from itertools import combinations
+        
+        total_penalty = 0
+        
+        # Get triplet diversity configuration
+        triplet_config = self.config.get('triplet_diversity', {
+            'base_weight': 500,
+            'penalty_exponent': 3.5,
+            'max_penalty_cap': 20000,
+            'triplet_penalty_multiplier': 10.0
+        })
+        
+        base_weight = triplet_config['base_weight']
+        exponent = triplet_config['penalty_exponent']
+        max_cap = triplet_config['max_penalty_cap']
+        multiplier = triplet_config['triplet_penalty_multiplier']
+        
+        self.log_debug(f"🎯 TRIPLET PENALTY CONFIGURATION:")
+        self.log_debug(f"   base_weight={base_weight}, exponent={exponent}, max_cap={max_cap}")
+        self.log_debug(f"   triplet_multiplier={multiplier}")
+        
+        triplet_penalties = 0
+        triplets_evaluated = 0
+        
+        # Calculate penalty for each triplet in current groups
+        for group_idx, group in enumerate(groups):
+            group_children = [child.name for child in group.children]
+            self.log_debug(f"🔍 Evaluating triplets in Group {group_idx + 1}: {group_children}")
+            
+            # Generate all possible triplets from this group (4 choose 3 = 4 triplets)
+            for triplet_children in combinations(group.children, 3):
+                triplets_evaluated += 1
+                
+                # Calculate how many times this specific triplet has met before
+                triplet_names = [child.name for child in triplet_children]
+                triplet_key = tuple(sorted(triplet_names))
+                
+                # Count meetings between all pairs in this triplet
+                meeting_counts = []
+                for i in range(len(triplet_children)):
+                    for j in range(i + 1, len(triplet_children)):
+                        child1 = triplet_children[i]
+                        child2 = triplet_children[j]
+                        
+                        meeting_count = 0
+                        if child2.name in child1.meetings:
+                            meeting_count = child1.meetings[child2.name]
+                        meeting_counts.append(meeting_count)
+                
+                # The triplet meeting count is the minimum of all pair meetings
+                # (they can only have met as a triplet as many times as their least-connected pair)
+                triplet_meeting_count = min(meeting_counts) if meeting_counts else 0
+                
+                if triplet_meeting_count > 0:
+                    # Apply progressive penalty for triplet recurrence
+                    raw_penalty = base_weight * (triplet_meeting_count ** exponent) * multiplier
+                    capped_penalty = min(raw_penalty, max_cap)
+                    total_penalty += capped_penalty
+                    triplet_penalties += 1
+                    
+                    self.log_debug(f"   🚨 TRIPLET PENALTY: {triplet_key}")
+                    self.log_debug(f"      Meeting counts: {meeting_counts} → min: {triplet_meeting_count}")
+                    self.log_debug(f"      Penalty: {base_weight} × {triplet_meeting_count}^{exponent} × {multiplier} = {raw_penalty:.1f} (capped: {capped_penalty:.1f})")
+                else:
+                    self.log_debug(f"   ✅ NEW TRIPLET: {triplet_key} (no penalty)")
+        
+        # Summary logging
+        self.log_debug(f"\n🎯 TRIPLET PENALTY SUMMARY:")
+        self.log_debug(f"   Total triplets evaluated: {triplets_evaluated}")
+        self.log_debug(f"   Triplets with penalties: {triplet_penalties}")
+        self.log_debug(f"   Total triplet penalty: {total_penalty:.2f}")
+        
+        return total_penalty
+
     def _get_perfect_score(self):
         """Calculate the theoretical perfect score."""
         return (self.weights['gender_balance'] * 6 +     # Perfect gender balance

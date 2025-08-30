@@ -9,10 +9,16 @@
         "meeting_fairness": 10
     },
     "meeting_diversity": {
-        "base_weight": 50,
-        "penalty_exponent": 2.5,
+        "base_weight": 200,
+        "penalty_exponent": 3.0,
         "max_penalty_cap": 5000,
         "same_gender_meeting_penalty_multiplier": 3.0
+    },
+    "triplet_diversity": {
+        "base_weight": 500,
+        "penalty_exponent": 3.5,
+        "max_penalty_cap": 20000,
+        "triplet_penalty_multiplier": 10.0
     },
     "constraints": {
         "target_boys_per_group": 2,
