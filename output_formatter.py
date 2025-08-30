@@ -387,8 +387,11 @@ class OutputFormatter:
         quartets = []
         triplets_count = {}
         quartets_count = {}
+        triplets_iterations = {}  # Track which iterations each triplet appeared in
+        quartets_iterations = {}  # Track which iterations each quartet appeared in
         
-        for iteration_groups in all_iterations:
+        for iteration_idx, iteration_groups in enumerate(all_iterations):
+            iteration_num = iteration_idx + 1  # 1-based iteration numbering
             for group in iteration_groups:
                 # Get sorted names for consistent comparison
                 group_names = sorted([child.name for child in group.children])
@@ -396,11 +399,17 @@ class OutputFormatter:
                 # Store quartet (full group of 4)
                 quartet_key = tuple(group_names)
                 quartets_count[quartet_key] = quartets_count.get(quartet_key, 0) + 1
+                if quartet_key not in quartets_iterations:
+                    quartets_iterations[quartet_key] = []
+                quartets_iterations[quartet_key].append(iteration_num)
                 
                 # Generate all triplet combinations from this group
                 for triplet in combinations(group_names, 3):
                     triplet_key = tuple(sorted(triplet))
                     triplets_count[triplet_key] = triplets_count.get(triplet_key, 0) + 1
+                    if triplet_key not in triplets_iterations:
+                        triplets_iterations[triplet_key] = []
+                    triplets_iterations[triplet_key].append(iteration_num)
         
         # Find recurring quartets (appear more than once)
         recurring_quartets = {k: v for k, v in quartets_count.items() if v > 1}
@@ -420,7 +429,8 @@ class OutputFormatter:
             
             for quartet, count in sorted_quartets:
                 names = ', '.join(quartet)
-                f.write(f"  {count} times: {names}\n")
+                iterations = ', '.join(map(str, sorted(quartets_iterations[quartet])))
+                f.write(f"  {count} times: {names} (iterations {iterations})\n")
         else:
             f.write("  No recurring quartets found.\n")
         
@@ -436,7 +446,8 @@ class OutputFormatter:
             
             for triplet, count in sorted_triplets:
                 names = ', '.join(triplet)
-                f.write(f"  {count} times: {names}\n")
+                iterations = ', '.join(map(str, sorted(triplets_iterations[triplet])))
+                f.write(f"  {count} times: {names} (iterations {iterations})\n")
         else:
             f.write("  No recurring triplets found.\n")
         
