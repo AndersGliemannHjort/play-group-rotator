@@ -15,9 +15,9 @@
         "same_gender_meeting_penalty_multiplier": 3.0
     },
     "triplet_diversity": {
-        "base_weight": 500,
+        "base_weight": 5000,
         "penalty_exponent": 3.5,
-        "max_penalty_cap": 20000,
+        "max_penalty_cap": 200000,
         "triplet_penalty_multiplier": 10.0
     },
     "hosting_break_penalties": {
