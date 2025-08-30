@@ -17,7 +17,15 @@
         "base_weight": 2000,
         "penalty_exponent": 3.5,
         "max_penalty_cap": 80000,
-        "triplet_penalty_multiplier": 10.0
+        "triplet_penalty_multiplier": 10.0,
+        "proximity_penalties": {
+            "gap_0_multiplier": 5.0,
+            "gap_1_multiplier": 3.0,
+            "gap_2_multiplier": 2.0,
+            "gap_3_multiplier": 1.5,
+            "gap_4_multiplier": 1.2,
+            "gap_5_plus_multiplier": 1.0
+        }
     },
     "hosting_break_penalties": {
         "break_0_penalty": -1000,

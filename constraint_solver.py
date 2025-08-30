@@ -863,7 +863,7 @@ class ConstraintSolver:
         return final_score
     
     def _calculate_triplet_penalty(self, groups):
-        """Calculate progressive penalty for repeated triplet combinations."""
+        """Calculate progressive penalty for repeated triplet combinations with proximity-based adjustments."""
         from itertools import combinations
         
         total_penalty = 0
@@ -873,17 +873,27 @@ class ConstraintSolver:
             'base_weight': 500,
             'penalty_exponent': 3.5,
             'max_penalty_cap': 20000,
-            'triplet_penalty_multiplier': 10.0
+            'triplet_penalty_multiplier': 10.0,
+            'proximity_penalties': {
+                'gap_0_multiplier': 5.0,
+                'gap_1_multiplier': 3.0,
+                'gap_2_multiplier': 2.0,
+                'gap_3_multiplier': 1.5,
+                'gap_4_multiplier': 1.2,
+                'gap_5_plus_multiplier': 1.0
+            }
         })
         
         base_weight = triplet_config['base_weight']
         exponent = triplet_config['penalty_exponent']
         max_cap = triplet_config['max_penalty_cap']
         multiplier = triplet_config['triplet_penalty_multiplier']
+        proximity_penalties = triplet_config['proximity_penalties']
         
         self.log_debug(f"🎯 TRIPLET PENALTY CONFIGURATION:")
         self.log_debug(f"   base_weight={base_weight}, exponent={exponent}, max_cap={max_cap}")
         self.log_debug(f"   triplet_multiplier={multiplier}")
+        self.log_debug(f"   proximity_penalties={proximity_penalties}")
         
         triplet_penalties = 0
         triplets_evaluated = 0
@@ -901,32 +911,33 @@ class ConstraintSolver:
                 triplet_names = [child.name for child in triplet_children]
                 triplet_key = tuple(sorted(triplet_names))
                 
-                # Count meetings between all pairs in this triplet
-                meeting_counts = []
-                for i in range(len(triplet_children)):
-                    for j in range(i + 1, len(triplet_children)):
-                        child1 = triplet_children[i]
-                        child2 = triplet_children[j]
-                        
-                        meeting_count = 0
-                        if child2.name in child1.meetings:
-                            meeting_count = child1.meetings[child2.name]
-                        meeting_counts.append(meeting_count)
+                # Get triplet meeting history from any child in the triplet
+                triplet_iterations = []
+                for child in triplet_children:
+                    if triplet_key in child.triplet_meetings:
+                        triplet_iterations = child.triplet_meetings[triplet_key]
+                        break
                 
-                # The triplet meeting count is the minimum of all pair meetings
-                # (they can only have met as a triplet as many times as their least-connected pair)
-                triplet_meeting_count = min(meeting_counts) if meeting_counts else 0
+                triplet_meeting_count = len(triplet_iterations)
                 
                 if triplet_meeting_count > 0:
-                    # Apply progressive penalty for triplet recurrence
-                    raw_penalty = base_weight * (triplet_meeting_count ** exponent) * multiplier
-                    capped_penalty = min(raw_penalty, max_cap)
+                    # Calculate proximity-based multiplier
+                    proximity_multiplier = self._calculate_proximity_multiplier(triplet_iterations, proximity_penalties)
+                    
+                    # Apply progressive penalty for triplet recurrence with proximity adjustment
+                    base_penalty = base_weight * (triplet_meeting_count ** exponent) * multiplier
+                    proximity_adjusted_penalty = base_penalty * proximity_multiplier
+                    capped_penalty = min(proximity_adjusted_penalty, max_cap)
                     total_penalty += capped_penalty
                     triplet_penalties += 1
                     
                     self.log_debug(f"   🚨 TRIPLET PENALTY: {triplet_key}")
-                    self.log_debug(f"      Meeting counts: {meeting_counts} → min: {triplet_meeting_count}")
-                    self.log_debug(f"      Penalty: {base_weight} × {triplet_meeting_count}^{exponent} × {multiplier} = {raw_penalty:.1f} (capped: {capped_penalty:.1f})")
+                    self.log_debug(f"      Meeting iterations: {triplet_iterations}")
+                    self.log_debug(f"      Meeting count: {triplet_meeting_count}")
+                    self.log_debug(f"      Proximity multiplier: {proximity_multiplier:.2f}")
+                    self.log_debug(f"      Base penalty: {base_weight} × {triplet_meeting_count}^{exponent} × {multiplier} = {base_penalty:.1f}")
+                    self.log_debug(f"      Proximity adjusted: {base_penalty:.1f} × {proximity_multiplier:.2f} = {proximity_adjusted_penalty:.1f}")
+                    self.log_debug(f"      Final penalty (capped): {capped_penalty:.1f}")
                 else:
                     self.log_debug(f"   ✅ NEW TRIPLET: {triplet_key} (no penalty)")
         
@@ -937,6 +948,36 @@ class ConstraintSolver:
         self.log_debug(f"   Total triplet penalty: {total_penalty:.2f}")
         
         return total_penalty
+
+    def _calculate_proximity_multiplier(self, triplet_iterations, proximity_penalties):
+        """Calculate proximity-based penalty multiplier based on iteration gaps."""
+        if len(triplet_iterations) < 2:
+            return 1.0  # No proximity penalty for single occurrence
+        
+        # Calculate minimum gap between any two meetings
+        sorted_iterations = sorted(triplet_iterations)
+        min_gap = float('inf')
+        
+        for i in range(1, len(sorted_iterations)):
+            gap = sorted_iterations[i] - sorted_iterations[i-1] - 1
+            min_gap = min(min_gap, gap)
+        
+        # Apply proximity multiplier based on minimum gap
+        if min_gap == 0:
+            multiplier = proximity_penalties['gap_0_multiplier']
+        elif min_gap == 1:
+            multiplier = proximity_penalties['gap_1_multiplier']
+        elif min_gap == 2:
+            multiplier = proximity_penalties['gap_2_multiplier']
+        elif min_gap == 3:
+            multiplier = proximity_penalties['gap_3_multiplier']
+        elif min_gap == 4:
+            multiplier = proximity_penalties['gap_4_multiplier']
+        else:  # min_gap >= 5
+            multiplier = proximity_penalties['gap_5_plus_multiplier']
+        
+        self.log_debug(f"      Proximity calculation: min_gap={min_gap}, multiplier={multiplier:.2f}")
+        return multiplier
 
     def _get_perfect_score(self):
         """Calculate the theoretical perfect score."""

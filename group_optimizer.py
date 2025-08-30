@@ -98,6 +98,8 @@ class GroupOptimizer:
     
     def _update_child_statistics(self, children, groups, iteration_num):
         """Update hosting counts and meeting records for children."""
+        from itertools import combinations
+        
         for group in groups:
             # Update host count
             if group.host:
@@ -113,6 +115,17 @@ class GroupOptimizer:
                             child1.meetings[child2.name] += 1
                         else:
                             child1.meetings[child2.name] = 1
+            
+            # Update triplet meetings for each child in the group
+            for triplet_children in combinations(group.children, 3):
+                triplet_names = [child.name for child in triplet_children]
+                triplet_key = tuple(sorted(triplet_names))
+                
+                # Add this iteration to each child's triplet meeting record
+                for child in triplet_children:
+                    if triplet_key not in child.triplet_meetings:
+                        child.triplet_meetings[triplet_key] = []
+                    child.triplet_meetings[triplet_key].append(iteration_num)
     
     def _validate_groups(self, groups, iteration_num):
         """Validate that groups meet basic requirements."""
