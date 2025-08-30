@@ -22,6 +22,8 @@
     },
     "algorithm": {
         "max_attempts": 10000,
-        "backtrack_threshold": 0.7
+        "backtrack_threshold": 0.7,
+        "solution_search_intensity": 2000,
+        "progress_reporting_interval": 100
     }
 }

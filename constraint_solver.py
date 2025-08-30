@@ -41,36 +41,65 @@ class ConstraintSolver:
             print(f"Warning: Could not write debug log: {e}")
     
     def solve(self, children, iteration_num, previous_iterations):
-        """Solve the constraint satisfaction problem to create optimal groups."""
+        """Solve the constraint satisfaction problem to create optimal groups using comprehensive search."""
         self.current_iteration = iteration_num  # Store for use in other methods
         self.log_debug(f"\n=== SOLVING ITERATION {iteration_num} ===")
         self.log_debug(f"Children: {[child.name for child in children]}")
         self.log_debug(f"Previous iterations: {len(previous_iterations)}")
+        
+        # Get search intensity parameter
+        search_intensity = self.algorithm.get('solution_search_intensity', 1000)
+        progress_interval = self.algorithm.get('progress_reporting_interval', 100)
+        
+        self.log_debug(f"🔍 COMPREHENSIVE SEARCH MODE: {search_intensity} solution attempts")
+        self.log_debug(f"📊 Progress reporting every {progress_interval} attempts")
         
         boys = [child for child in children if child.is_boy]
         girls = [child for child in children if child.is_girl]
         
         best_solution = None
         best_score = float('-inf')
+        valid_solutions_found = 0
         attempts = 0
         
-        # Try multiple times to find the best solution
-        while attempts < self.algorithm['max_attempts']:
+        # Comprehensive search: try many solutions and pick the absolute best
+        while attempts < search_intensity:
             attempts += 1
             
             # Generate a candidate solution
             solution = self._generate_candidate_solution(boys, girls, iteration_num, previous_iterations)
             
             if solution:
+                valid_solutions_found += 1
                 score = self._evaluate_solution(solution, iteration_num, previous_iterations)
                 
                 if score > best_score:
                     best_score = score
                     best_solution = solution
+                    self.log_debug(f"🏆 NEW BEST SOLUTION found at attempt {attempts}: score={score:.2f}")
                 
-                # If we found a solution that meets the threshold, we can stop early
-                if score >= self.algorithm['backtrack_threshold'] * self._get_perfect_score():
-                    break
+                # Progress reporting
+                if attempts % progress_interval == 0:
+                    self.log_debug(f"📈 Progress: {attempts}/{search_intensity} attempts, {valid_solutions_found} valid solutions, best score: {best_score:.2f}")
+            
+            # Early termination only if we have a near-perfect solution
+            # Use a very high threshold to encourage comprehensive search
+            perfect_score = self._get_perfect_score()
+            if best_solution and best_score >= 0.99 * perfect_score:
+                self.log_debug(f"🎯 EARLY TERMINATION: Near-perfect solution found (score: {best_score:.2f}, {(best_score/perfect_score)*100:.1f}% of perfect)")
+                break
+        
+        # Final search summary
+        self.log_debug(f"\n=== COMPREHENSIVE SEARCH COMPLETED ===")
+        self.log_debug(f"Total attempts: {attempts}")
+        self.log_debug(f"Valid solutions found: {valid_solutions_found}")
+        self.log_debug(f"Success rate: {(valid_solutions_found/attempts)*100:.1f}%")
+        self.log_debug(f"Best score achieved: {best_score:.2f}")
+        
+        if best_solution:
+            perfect_score = self._get_perfect_score()
+            quality_percentage = (best_score / perfect_score) * 100
+            self.log_debug(f"Solution quality: {quality_percentage:.1f}% of theoretical perfect score")
         
         return best_solution
     
