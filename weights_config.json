@@ -32,9 +32,9 @@
         "max_meeting_difference": 2       // Threshold for meeting count variations (used in validation)
     },
     "algorithm": {
-        "max_attempts": 10000,            // Maximum solution attempts before giving up on iteration
+        "max_attempts": 100000,            // Maximum solution attempts before giving up on iteration
         "backtrack_threshold": 0.7,       // Quality threshold for accepting solutions (0.0-1.0)
-        "solution_search_intensity": 10000,  // How many different host combinations to try
+        "solution_search_intensity": 100000,  // How many different host combinations to try
         "progress_reporting_interval": 100   // How often to log progress during search (every N attempts)
     }
 }
