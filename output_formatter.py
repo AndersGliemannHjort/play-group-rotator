@@ -34,7 +34,7 @@ class OutputFormatter:
         except Exception as e:
             raise Exception(f"Error writing groups file: {e}")
     
-    def write_summary_file(self, children, all_iterations, filepath, warnings, debug_log=None, past_iteration_count=0):
+    def write_summary_file(self, children, all_iterations, filepath, warnings, debug_log=None, past_iteration_count=0, optimizer=None):
         """Write detailed summary report."""
         try:
             with open(filepath, 'w', encoding='utf-8') as f:
@@ -95,12 +95,25 @@ class OutputFormatter:
                 f.write("while minimizing less critical violations.\n\n")
                 f.write("=" * 50 + "\n\n")
                 
+                # Get statistics for new iterations only
+                if optimizer and past_iteration_count > 0:
+                    new_stats = optimizer.get_new_iterations_statistics(all_iterations, past_iteration_count)
+                    hosting_counts = new_stats['hosting_counts']
+                    meeting_matrix = new_stats['meeting_matrix']
+                    hosting_iterations_data = new_stats['hosting_iterations']
+                else:
+                    # Fallback to full statistics if no optimizer or no past iterations
+                    hosting_counts = {}
+                    meeting_matrix = {}
+                    hosting_iterations_data = {}
+                    for child in children:
+                        hosting_counts[child.name] = child.hosting_count
+                        meeting_matrix[child.name] = child.meetings
+                        hosting_iterations_data[child.name] = child.hosting_iterations if hasattr(child, 'hosting_iterations') else []
+                
                 # Write hosting statistics
                 f.write("HOSTING COUNTS\n")
                 f.write("-" * 20 + "\n")
-                hosting_counts = {}
-                for child in children:
-                    hosting_counts[child.name] = child.hosting_count
                 
                 # Sort by hosting count (descending) then by name
                 sorted_hosting = sorted(hosting_counts.items(), 
@@ -121,10 +134,11 @@ class OutputFormatter:
                 
                 # Calculate hosting proximity for children with multiple hostings
                 proximity_data = []
-                for child in children:
-                    if hasattr(child, 'hosting_iterations') and len(child.hosting_iterations) > 1:
+                for child_name in hosting_iterations_data:
+                    child_hosting_iterations = hosting_iterations_data[child_name]
+                    if len(child_hosting_iterations) > 1:
                         # Calculate all breaks between hosting periods
-                        sorted_iterations = sorted(child.hosting_iterations)
+                        sorted_iterations = sorted(child_hosting_iterations)
                         breaks = []
                         for i in range(1, len(sorted_iterations)):
                             break_length = sorted_iterations[i] - sorted_iterations[i-1] - 1
@@ -132,7 +146,7 @@ class OutputFormatter:
                         
                         # Get minimum break
                         min_break = min(breaks)
-                        proximity_data.append((child.name, min_break, sorted_iterations))
+                        proximity_data.append((child_name, min_break, sorted_iterations))
                 
                 # Sort by minimum break (ascending), then by name (alphabetical)
                 proximity_data.sort(key=lambda x: (x[1], x[0]))
@@ -153,13 +167,13 @@ class OutputFormatter:
                 f.write("Shows how many times each child has been grouped with others:\n\n")
                 
                 # Sort children by name for consistent output
-                sorted_children = sorted(children, key=lambda x: x.name)
+                sorted_child_names = sorted(meeting_matrix.keys())
                 
-                for child in sorted_children:
-                    f.write(f"{child.name}:\n")
+                for child_name in sorted_child_names:
+                    f.write(f"{child_name}:\n")
                     
-                    # Get meeting counts (child.meetings is now a dictionary)
-                    meeting_counts = child.meetings.copy()
+                    # Get meeting counts from new iterations statistics
+                    meeting_counts = meeting_matrix[child_name].copy()
                     
                     # Sort meetings by count (descending) then by name
                     if meeting_counts:
@@ -192,22 +206,26 @@ class OutputFormatter:
                 f.write("-" * 20 + "\n")
                 
                 # Create list of (child_name, meeting_count) and sort by count (desc) then name
-                meeting_stats = [(child.name, len(child.meetings)) for child in children]
+                meeting_stats = [(child_name, len(meetings)) for child_name, meetings in meeting_matrix.items()]
                 meeting_stats.sort(key=lambda x: (-x[1], x[0]))
                 
                 for name, meeting_count in meeting_stats:
                     f.write(f"{name:<20} met {meeting_count:>2} different children\n")
                 
                 # Overall meeting stats
-                meeting_counts = [len(child.meetings) for child in children]
-                f.write(f"\nMeeting Statistics:\n")
-                f.write(f"  Min: {min(meeting_counts)}, Max: {max(meeting_counts)}, Avg: {sum(meeting_counts)/len(meeting_counts):.1f}\n\n")
+                meeting_counts = [len(meetings) for meetings in meeting_matrix.values()]
+                if meeting_counts:
+                    f.write(f"\nMeeting Statistics:\n")
+                    f.write(f"  Min: {min(meeting_counts)}, Max: {max(meeting_counts)}, Avg: {sum(meeting_counts)/len(meeting_counts):.1f}\n\n")
+                else:
+                    f.write(f"\nNo meetings recorded in new iterations.\n\n")
                 
                 # Write iteration details
                 f.write("ITERATION DETAILS\n")
                 f.write("-" * 20 + "\n")
                 for iteration_num, groups in enumerate(all_iterations, 1):
-                    f.write(f"\nIteration {iteration_num}:\n")
+                    absolute_iteration_num = past_iteration_count + iteration_num
+                    f.write(f"\nIteration {absolute_iteration_num}:\n")
                     for group_num, group in enumerate(groups, 1):
                         boys = len(group.get_boys())
                         girls = len(group.get_girls())

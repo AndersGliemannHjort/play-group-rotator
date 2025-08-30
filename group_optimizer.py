@@ -159,3 +159,45 @@ class GroupOptimizer:
             stats['total_meetings'][child.name] = len(child.meetings)
         
         return stats
+    
+    def get_new_iterations_statistics(self, new_iterations, past_iteration_count):
+        """Get statistics for only the new iterations."""
+        stats = {
+            'hosting_counts': {},
+            'meeting_matrix': {},
+            'hosting_iterations': {}
+        }
+        
+        # Initialize all children with zero counts
+        all_children = set()
+        for groups in new_iterations:
+            for group in groups:
+                for child in group.children:
+                    all_children.add(child.name)
+        
+        for child_name in all_children:
+            stats['hosting_counts'][child_name] = 0
+            stats['meeting_matrix'][child_name] = {}
+            stats['hosting_iterations'][child_name] = []
+        
+        # Calculate statistics only from new iterations
+        for iteration_num, groups in enumerate(new_iterations, 1):
+            absolute_iteration_num = past_iteration_count + iteration_num
+            
+            for group in groups:
+                # Count hosting for first child (host)
+                if group.host:
+                    stats['hosting_counts'][group.host.name] += 1
+                    stats['hosting_iterations'][group.host.name].append(absolute_iteration_num)
+                
+                # Count meetings between all children in the group
+                for i, child1 in enumerate(group.children):
+                    for j, child2 in enumerate(group.children):
+                        if i != j:
+                            child2_name = child2.name
+                            if child2_name in stats['meeting_matrix'][child1.name]:
+                                stats['meeting_matrix'][child1.name][child2_name] += 1
+                            else:
+                                stats['meeting_matrix'][child1.name][child2_name] = 1
+        
+        return stats
