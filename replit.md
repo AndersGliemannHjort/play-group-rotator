@@ -39,10 +39,12 @@ Preferred communication style: Simple, everyday language.
 
 **Constraint Satisfaction Algorithm**: Implements a weighted scoring system that optimizes for:
 - Gender balance within groups
-- Fair host rotation across iterations
-- Meeting diversity (avoiding repeated pairings)
+- Fair host rotation across iterations with minimum break threshold (≥2 iterations)
+- Meeting diversity (avoiding repeated pairings) 
 - Equal hosting opportunities
 - Balanced meeting frequencies
+
+**Minimum Break Threshold Approach**: Host selection excludes children with break lengths <2 (consecutive hosting) while treating breaks ≥2 equally with randomization. This prevents unfair consecutive hosting while maximizing flexibility for improved meeting diversity.
 
 **File-Based I/O Architecture**: 
 - Input: Tab-delimited text files with child name and gender columns
