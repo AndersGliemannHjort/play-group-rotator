@@ -18,6 +18,9 @@ class ConstraintSolver:
         self.constraints = config['constraints']
         self.algorithm = config['algorithm']
         
+        # Centralized triplet history tracking
+        self.triplet_history = {}  # {triplet_key: [iteration_numbers]}
+        
         # Setup debug logging
         self.debug_log = []
         self.log_debug("=== ConstraintSolver Debug Log Started ===")
@@ -39,6 +42,24 @@ class ConstraintSolver:
                     f.write(entry + "\n")
         except Exception as e:
             print(f"Warning: Could not write debug log: {e}")
+    
+    def add_triplet_to_history(self, children, iteration_num):
+        """Add all triplets from groups to centralized history."""
+        from itertools import combinations
+        
+        # Generate all possible triplets from the group (4 choose 3 = 4 triplets)
+        for triplet_children in combinations(children, 3):
+            triplet_names = [child.name for child in triplet_children]
+            triplet_key = tuple(sorted(triplet_names))
+            
+            # Add this iteration to the centralized triplet history
+            if triplet_key not in self.triplet_history:
+                self.triplet_history[triplet_key] = []
+            self.triplet_history[triplet_key].append(iteration_num)
+    
+    def get_triplet_iterations(self, triplet_key):
+        """Get all iteration numbers where a triplet has met."""
+        return self.triplet_history.get(triplet_key, [])
     
     def solve(self, children, iteration_num, previous_iterations):
         """Solve the constraint satisfaction problem to create optimal groups using comprehensive search."""
@@ -911,12 +932,8 @@ class ConstraintSolver:
                 triplet_names = [child.name for child in triplet_children]
                 triplet_key = tuple(sorted(triplet_names))
                 
-                # Get triplet meeting history from any child in the triplet
-                triplet_iterations = []
-                for child in triplet_children:
-                    if triplet_key in child.triplet_meetings:
-                        triplet_iterations = child.triplet_meetings[triplet_key]
-                        break
+                # Get triplet meeting history from centralized tracking
+                triplet_iterations = self.get_triplet_iterations(triplet_key)
                 
                 triplet_meeting_count = len(triplet_iterations)
                 

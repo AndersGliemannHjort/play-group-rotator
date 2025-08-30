@@ -90,6 +90,10 @@ class GroupOptimizer:
         # Update child statistics
         self._update_child_statistics(children, groups, iteration_num)
         
+        # Update centralized triplet history in solver
+        for group in groups:
+            self.solver.add_triplet_to_history(group.children, iteration_num)
+        
         # Validate groups
         if not self._validate_groups(groups, iteration_num):
             return None
@@ -116,16 +120,6 @@ class GroupOptimizer:
                         else:
                             child1.meetings[child2.name] = 1
             
-            # Update triplet meetings for each child in the group
-            for triplet_children in combinations(group.children, 3):
-                triplet_names = [child.name for child in triplet_children]
-                triplet_key = tuple(sorted(triplet_names))
-                
-                # Add this iteration to each child's triplet meeting record
-                for child in triplet_children:
-                    if triplet_key not in child.triplet_meetings:
-                        child.triplet_meetings[triplet_key] = []
-                    child.triplet_meetings[triplet_key].append(iteration_num)
     
     def _validate_groups(self, groups, iteration_num):
         """Validate that groups meet basic requirements."""
@@ -157,6 +151,10 @@ class GroupOptimizer:
         for iteration_num, groups in enumerate(past_iterations, 1):
             # Update child statistics for this past iteration
             self._update_child_statistics(children, groups, iteration_num)
+            
+            # Update centralized triplet history in solver for past iterations
+            for group in groups:
+                self.solver.add_triplet_to_history(group.children, iteration_num)
     
     def get_statistics(self, children):
         """Get statistics about hosting and meetings for all children."""
