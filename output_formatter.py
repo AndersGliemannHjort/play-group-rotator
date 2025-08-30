@@ -95,7 +95,7 @@ class OutputFormatter:
                     "3. Meeting Diversity (High): Children should meet different people when possible\n"
                 )
                 f.write(
-                    "4. Break Prevention (Medium): Discourages consecutive hosting periods\n\n"
+                    "4. Host break length (Medium): Discourages consecutive hosting periods\n\n"
                 )
 
                 f.write("Expected Outcomes Due to Mathematical Reality:\n\n")
@@ -137,12 +137,8 @@ class OutputFormatter:
                 f.write(
                     "of all constraints simultaneously is mathematically impossible. The system\n"
                 )
-                f.write(
-                    "prioritizes constraints based on importance:\n\n"
-                )
-                f.write(
-                    "- Gender balance is NEVER compromised\n"
-                )
+                f.write("prioritizes constraints based on importance:\n\n")
+                f.write("- Gender balance is NEVER compromised\n")
                 f.write(
                     "- Hosting fairness takes precedence over other patterns\n"
                 )
@@ -382,73 +378,84 @@ class OutputFormatter:
     def _write_quartets_triplets_analysis(self, f, all_iterations):
         """Write analysis of recurring quartets and triplets in NEW iterations."""
         from itertools import combinations
-        
+
         # Collect all quartets (full groups) from new iterations
         quartets = []
         triplets_count = {}
         quartets_count = {}
-        triplets_iterations = {}  # Track which iterations each triplet appeared in
-        quartets_iterations = {}  # Track which iterations each quartet appeared in
-        
+        triplets_iterations = {
+        }  # Track which iterations each triplet appeared in
+        quartets_iterations = {
+        }  # Track which iterations each quartet appeared in
+
         for iteration_idx, iteration_groups in enumerate(all_iterations):
             iteration_num = iteration_idx + 1  # 1-based iteration numbering
             for group in iteration_groups:
                 # Get sorted names for consistent comparison
                 group_names = sorted([child.name for child in group.children])
-                
+
                 # Store quartet (full group of 4)
                 quartet_key = tuple(group_names)
-                quartets_count[quartet_key] = quartets_count.get(quartet_key, 0) + 1
+                quartets_count[quartet_key] = quartets_count.get(
+                    quartet_key, 0) + 1
                 if quartet_key not in quartets_iterations:
                     quartets_iterations[quartet_key] = []
                 quartets_iterations[quartet_key].append(iteration_num)
-                
+
                 # Generate all triplet combinations from this group
                 for triplet in combinations(group_names, 3):
                     triplet_key = tuple(sorted(triplet))
-                    triplets_count[triplet_key] = triplets_count.get(triplet_key, 0) + 1
+                    triplets_count[triplet_key] = triplets_count.get(
+                        triplet_key, 0) + 1
                     if triplet_key not in triplets_iterations:
                         triplets_iterations[triplet_key] = []
                     triplets_iterations[triplet_key].append(iteration_num)
-        
+
         # Find recurring quartets (appear more than once)
         recurring_quartets = {k: v for k, v in quartets_count.items() if v > 1}
-        
+
         # Find recurring triplets (appear more than once)
         recurring_triplets = {k: v for k, v in triplets_count.items() if v > 1}
-        
+
         # Write quartets section
         f.write("\nRECURRING QUARTETS FOR NEW ITERATIONS\n")
         f.write("-" * 20 + "\n")
-        f.write("Shows complete 4-person groups that met together multiple times:\n\n")
-        
+        f.write(
+            "Shows complete 4-person groups that met together multiple times:\n\n"
+        )
+
         if recurring_quartets:
             # Sort by frequency (descending), then alphabetically
-            sorted_quartets = sorted(recurring_quartets.items(), 
-                                   key=lambda x: (-x[1], x[0]))
-            
+            sorted_quartets = sorted(recurring_quartets.items(),
+                                     key=lambda x: (-x[1], x[0]))
+
             for quartet, count in sorted_quartets:
                 names = ', '.join(quartet)
-                iterations = ', '.join(map(str, sorted(quartets_iterations[quartet])))
-                f.write(f"  {count} times: {names} (iterations {iterations})\n")
+                iterations = ', '.join(
+                    map(str, sorted(quartets_iterations[quartet])))
+                f.write(
+                    f"  {count} times: {names} (iterations {iterations})\n")
         else:
             f.write("  No recurring quartets found.\n")
-        
+
         # Write triplets section
         f.write("\nRECURRING TRIPLETS FOR NEW ITERATIONS\n")
         f.write("-" * 20 + "\n")
-        f.write("Shows 3-person subgroups that met together multiple times:\n\n")
-        
+        f.write(
+            "Shows 3-person subgroups that met together multiple times:\n\n")
+
         if recurring_triplets:
             # Sort by frequency (descending), then alphabetically
-            sorted_triplets = sorted(recurring_triplets.items(), 
-                                   key=lambda x: (-x[1], x[0]))
-            
+            sorted_triplets = sorted(recurring_triplets.items(),
+                                     key=lambda x: (-x[1], x[0]))
+
             for triplet, count in sorted_triplets:
                 names = ', '.join(triplet)
-                iterations = ', '.join(map(str, sorted(triplets_iterations[triplet])))
-                f.write(f"  {count} times: {names} (iterations {iterations})\n")
+                iterations = ', '.join(
+                    map(str, sorted(triplets_iterations[triplet])))
+                f.write(
+                    f"  {count} times: {names} (iterations {iterations})\n")
         else:
             f.write("  No recurring triplets found.\n")
-        
+
         f.write("\n")
