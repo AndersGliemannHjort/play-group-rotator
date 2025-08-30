@@ -177,45 +177,106 @@ class ConstraintSolver:
         min_hosting_children = [child for child in candidates if child.hosting_count == min_hosting]
         self.log_debug(f"Children with min hosting: {[child.name for child in min_hosting_children]}")
         
+        # OPTIMIZATION: Filter out children with terrible break lengths (0-1 iterations) 
+        # if we have enough good alternatives. This prevents wasting time on guaranteed losers.
+        self.log_debug(f"\n--- Intelligent break filtering to avoid wasted simulations ---")
+        
+        # Categorize children by break quality
+        excellent_breaks = []  # 3+ iterations
+        acceptable_breaks = []  # 2 iterations 
+        poor_breaks = []       # 0-1 iterations
+        
+        for child in min_hosting_children:
+            break_length = self._calculate_break_length(child)
+            if break_length >= 3:
+                excellent_breaks.append(child)
+            elif break_length == 2:
+                acceptable_breaks.append(child)
+            else:  # 0-1 iterations
+                poor_breaks.append(child)
+        
+        self.log_debug(f"Break quality distribution:")
+        self.log_debug(f"  Excellent (3+ breaks): {len(excellent_breaks)} children")
+        self.log_debug(f"  Acceptable (2 breaks): {len(acceptable_breaks)} children")
+        self.log_debug(f"  Poor (0-1 breaks): {len(poor_breaks)} children")
+        
+        # Smart selection: Use poor breaks only if absolutely necessary
+        available_good_hosts = excellent_breaks + acceptable_breaks
+        
+        if len(available_good_hosts) >= num_hosts:
+            # We have enough good hosts - ignore poor break hosts entirely
+            self.log_debug(f"✓ Using only good break hosts ({len(available_good_hosts)} available, {num_hosts} needed)")
+            candidate_pool = available_good_hosts
+        else:
+            # Need some poor break hosts, but minimize them
+            needed_poor = num_hosts - len(available_good_hosts)
+            self.log_debug(f"⚠️ Need {needed_poor} poor break hosts (insufficient good alternatives)")
+            candidate_pool = available_good_hosts + poor_breaks[:needed_poor]
+        
         # Select hosts with detailed reasoning
-        self.log_debug(f"\n--- Host selection with hosting count fairness only ---")
+        self.log_debug(f"\n--- Host selection with break optimization ---")
         selected_hosts = []
         
-        if len(min_hosting_children) >= num_hosts:
-            # Sufficient children with minimum hosting count - randomize selection
-            random.shuffle(min_hosting_children)
-            selected_hosts = min_hosting_children[:num_hosts]
+        if len(candidate_pool) >= num_hosts:
+            # Sufficient candidates after filtering - randomize selection
+            random.shuffle(candidate_pool)
+            selected_hosts = candidate_pool[:num_hosts]
             
-            self.log_debug(f"✓ Selected {num_hosts} hosts from {len(min_hosting_children)} children with minimum hosting count")
+            self.log_debug(f"✓ Selected {num_hosts} hosts using break-optimized selection")
             for i, host in enumerate(selected_hosts):
                 break_length = self._calculate_break_length(host)
-                self.log_debug(f"  ✓ {host.name}: hosting={host.hosting_count}, break={break_length} (hosting count fairness)")
+                break_quality = "excellent" if break_length >= 3 else "acceptable" if break_length == 2 else "poor"
+                self.log_debug(f"  ✓ {host.name}: hosting={host.hosting_count}, break={break_length} ({break_quality})")
                 
             # Show a few rejected for context
-            remaining_min_hosting = min_hosting_children[num_hosts:num_hosts + 3]
-            for child in remaining_min_hosting:
+            remaining_candidates = [c for c in candidate_pool if c not in selected_hosts]
+            for child in remaining_candidates[:3]:  # Show first 3 rejected
                 break_length = self._calculate_break_length(child)
-                self.log_debug(f"  ✗ {child.name}: hosting={child.hosting_count}, break={break_length} (not selected - random selection)")
+                break_quality = "excellent" if break_length >= 3 else "acceptable" if break_length == 2 else "poor"
+                self.log_debug(f"  ✗ {child.name}: hosting={child.hosting_count}, break={break_length} ({break_quality}) - not selected")
+                
+            # Show any poor break hosts that were completely filtered out
+            if len(available_good_hosts) >= num_hosts and poor_breaks:
+                self.log_debug(f"  Filtered out {len(poor_breaks)} poor break hosts: {[c.name for c in poor_breaks][:5]}...")
         else:
-            # Take all min hosting children and fill remaining from next hosting count
-            selected_hosts = min_hosting_children.copy()
-            self.log_debug(f"Taking all {len(min_hosting_children)} children with minimum hosting count")
+            # Use all available candidates (should not happen with proper filtering)
+            selected_hosts = candidate_pool.copy()
+            self.log_debug(f"Using all {len(candidate_pool)} available candidates")
             
             for host in selected_hosts:
                 break_length = self._calculate_break_length(host)
-                self.log_debug(f"  ✓ {host.name}: hosting={host.hosting_count}, break={break_length} (minimum hosting count)")
+                break_quality = "excellent" if break_length >= 3 else "acceptable" if break_length == 2 else "poor"
+                self.log_debug(f"  ✓ {host.name}: hosting={host.hosting_count}, break={break_length} ({break_quality})")
             
             remaining_needed = num_hosts - len(selected_hosts)
-            self.log_debug(f"\nNeed {remaining_needed} more hosts from next hosting count level:")
-            
-            # Get children from next hosting count level
-            remaining_candidates = [child for child in candidates if child not in selected_hosts]
-            random.shuffle(remaining_candidates)  # Randomize selection within same hosting count
-            
-            for i, child in enumerate(remaining_candidates[:remaining_needed]):
-                selected_hosts.append(child)
-                break_length = self._calculate_break_length(child)
-                self.log_debug(f"  ✓ {child.name}: hosting={child.hosting_count}, break={break_length} (next hosting count level)")
+            if remaining_needed > 0:
+                self.log_debug(f"\nNeed {remaining_needed} more hosts from next hosting count level:")
+                
+                # Get children from next hosting count level with same break optimization
+                remaining_candidates = [child for child in candidates if child not in selected_hosts]
+                
+                # Apply same break filtering to remaining candidates
+                remaining_good = []
+                remaining_poor = []
+                for child in remaining_candidates:
+                    break_length = self._calculate_break_length(child)
+                    if break_length >= 2:
+                        remaining_good.append(child)
+                    else:
+                        remaining_poor.append(child)
+                
+                # Prefer good breaks, use poor only if necessary
+                additional_hosts = remaining_good[:remaining_needed]
+                if len(additional_hosts) < remaining_needed:
+                    additional_hosts.extend(remaining_poor[:remaining_needed - len(additional_hosts)])
+                
+                random.shuffle(additional_hosts)
+                selected_hosts.extend(additional_hosts)
+                
+                for child in additional_hosts:
+                    break_length = self._calculate_break_length(child)
+                    break_quality = "excellent" if break_length >= 3 else "acceptable" if break_length == 2 else "poor"
+                    self.log_debug(f"  ✓ {child.name}: hosting={child.hosting_count}, break={break_length} ({break_quality}) - from next level")
         
         self.log_debug(f"\nFinal selected hosts: {[host.name for host in selected_hosts]}")
         self.log_debug(f"Break constraints will be evaluated during solution scoring phase")
