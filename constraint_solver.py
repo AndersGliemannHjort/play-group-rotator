@@ -344,8 +344,16 @@ class ConstraintSolver:
         last_hosting_iteration = max(child.hosting_iterations)
         return self.current_iteration - last_hosting_iteration - 1
     
-    def _calculate_break_penalty(self, break_length):
-        """Calculate graduated penalty based on break length."""
+    def _evaluate_break_constraint(self, break_length, evaluation_type='penalty'):
+        """Centralized break constraint evaluation - single source of truth for all break logic.
+        
+        Args:
+            break_length: Number of iterations since last hosting
+            evaluation_type: 'penalty' for selection scoring, 'balance' for fairness scoring, 'acceptable' for validation
+        
+        Returns:
+            penalty score (negative values), balance score (0-1), or boolean acceptability
+        """
         break_config = self.config.get('hosting_break_penalties', {
             'break_0_penalty': -1000,
             'break_1_penalty': -500,
@@ -353,14 +361,38 @@ class ConstraintSolver:
             'break_3_plus_penalty': 0
         })
         
-        if break_length == 0:
-            return break_config['break_0_penalty']
-        elif break_length == 1:
-            return break_config['break_1_penalty']
-        elif break_length == 2:
-            return break_config['break_2_penalty']
-        else:  # break_length >= 3
-            return break_config['break_3_plus_penalty']
+        if evaluation_type == 'penalty':
+            # For host selection and solution scoring
+            if break_length == 0:
+                return break_config['break_0_penalty']
+            elif break_length == 1:
+                return break_config['break_1_penalty']
+            elif break_length == 2:
+                return break_config['break_2_penalty']
+            else:  # break_length >= 3
+                return break_config['break_3_plus_penalty']
+                
+        elif evaluation_type == 'balance':
+            # For break balance fairness calculation (0 = worst, 1 = best)
+            if break_length == 0:
+                return 0.0  # Consecutive hosting = worst balance
+            elif break_length == 1:
+                return 0.2  # Very poor balance
+            elif break_length == 2:
+                return 0.8  # Good balance
+            else:  # break_length >= 3
+                return 1.0  # Perfect balance
+                
+        elif evaluation_type == 'acceptable':
+            # For validation - determines if break is acceptable at all
+            return break_length >= 0  # All breaks are acceptable now (penalties handle preference)
+            
+        else:
+            raise ValueError(f"Unknown evaluation_type: {evaluation_type}")
+    
+    def _calculate_break_penalty(self, break_length):
+        """Legacy compatibility function - redirects to centralized evaluation."""
+        return self._evaluate_break_constraint(break_length, 'penalty')
     
     def _validate_iteration_integrity(self, groups, original_children):
         """Comprehensive validation to ensure all children appear exactly once per iteration."""
@@ -833,8 +865,8 @@ class ConstraintSolver:
         self.log_debug(f"All hosting breaks: {all_hosting_breaks}")
         self.log_debug(f"Average break length: {average_break:.2f}")
         
-        # Calculate penalty for current hosts' new breaks
-        total_penalty = 0.0
+        # Calculate balance score using centralized break evaluation
+        total_balance_score = 0.0
         for host in current_hosts:
             host_iterations = all_children_hosting.get(host.name, [])
             if len(host_iterations) > 1:
@@ -842,17 +874,18 @@ class ConstraintSolver:
                 sorted_iterations = sorted(host_iterations)
                 latest_break = sorted_iterations[-1] - sorted_iterations[-2] - 1
                 
-                # Apply squared deviation penalty
-                deviation = latest_break - average_break
-                penalty = -(deviation ** 2)
-                total_penalty += penalty
+                # Use centralized break evaluation for balance scoring
+                balance_score = self._evaluate_break_constraint(latest_break, 'balance')
+                total_balance_score += balance_score
                 
-                self.log_debug(f"Host {host.name}: iterations {sorted_iterations}, latest break={latest_break}, deviation={deviation:.2f}, penalty={penalty:.2f}")
+                self.log_debug(f"Host {host.name}: iterations {sorted_iterations}, latest break={latest_break}, balance_score={balance_score:.2f}")
             else:
-                self.log_debug(f"Host {host.name}: only hosted once, no penalty")
+                # First time hosting gets perfect balance score
+                total_balance_score += 1.0
+                self.log_debug(f"Host {host.name}: first time hosting, balance_score=1.0")
         
-        final_score = total_penalty / len(current_hosts) if current_hosts else 0.0
-        self.log_debug(f"Total penalty: {total_penalty:.2f}, Final break balance score: {final_score:.2f}")
+        final_score = total_balance_score / len(current_hosts) if current_hosts else 0.0
+        self.log_debug(f"Total balance score: {total_balance_score:.2f}, Final break balance score: {final_score:.2f}")
         
         # Normalize by number of current hosts
         return final_score
