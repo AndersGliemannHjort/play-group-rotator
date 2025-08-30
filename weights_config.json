@@ -4,7 +4,6 @@
         "gender_balance": 1000000,
         "hosting_break_balance": 80000,
         "host_rotation": 50,
-        "group_diversity": 25,
         "host_fairness": 400,
         "meeting_fairness": 5
     },

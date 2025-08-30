@@ -943,6 +943,5 @@ class ConstraintSolver:
         return (self.weights['gender_balance'] * 6 +     # Perfect gender balance
                 self.weights['hosting_break_balance'] +   # Perfect break balance
                 self.weights['host_rotation'] +           # Perfect host rotation
-                self.weights['group_diversity'] +         # Perfect diversity
                 self.weights['host_fairness'] +           # Perfect host fairness
                 self.weights['meeting_fairness'])         # Perfect meeting fairness
