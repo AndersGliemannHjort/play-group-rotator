@@ -1,40 +1,40 @@
 {
     "description": "Configuration weights for constraint satisfaction algorithm",
     "weights": {
-        "gender_balance": 1000000,
-        "hosting_break_balance": 80000,
-        "host_rotation": 50,
-        "host_fairness": 400,
-        "meeting_fairness": 5
+        "gender_balance": 1000000,        // Sacred rule: 2B+2G per group, never compromised
+        "hosting_break_balance": 80000,   // Rewards good break lengths, prevents consecutive hosting cycles
+        "host_rotation": 50,              // Minor reward for not repeating hosts from previous iteration
+        "host_fairness": 400,             // Ensures hosting counts stay within 1 of each other
+        "meeting_fairness": 5             // Minor reward for balanced meeting distribution
     },
     "meeting_diversity": {
-        "base_weight": 200,
-        "penalty_exponent": 3.0,
-        "max_penalty_cap": 5000,
-        "same_gender_meeting_penalty_multiplier": 3.0
+        "base_weight": 200,               // Base penalty strength for repeated pair meetings
+        "penalty_exponent": 3.0,          // How aggressively penalties grow (higher = steeper curve)
+        "max_penalty_cap": 5000,          // Maximum penalty per repeated pair (prevents runaway scores)
+        "same_gender_meeting_penalty_multiplier": 3.0  // Same-gender repeats penalized 3x more than cross-gender
     },
     "triplet_diversity": {
-        "base_weight": 2000,
-        "penalty_exponent": 3.5,
-        "max_penalty_cap": 80000,
-        "triplet_penalty_multiplier": 10.0
+        "base_weight": 2000,              // Base penalty strength for repeated triplet formations
+        "penalty_exponent": 3.5,          // How aggressively triplet penalties grow
+        "max_penalty_cap": 80000,         // Maximum penalty per repeated triplet (very high to discourage)
+        "triplet_penalty_multiplier": 10.0  // Additional multiplier making triplet penalties severe
     },
     "hosting_break_penalties": {
-        "break_0_penalty": -1000,
-        "break_1_penalty": -500,
-        "break_2_penalty": -50,
-        "break_3_plus_penalty": 0
+        "break_0_penalty": -1000,         // Heavy penalty for consecutive hosting (back-to-back iterations)
+        "break_1_penalty": -500,          // Moderate penalty for 1-iteration break (still too soon)
+        "break_2_penalty": -50,           // Light penalty for 2-iteration break (acceptable but not ideal)
+        "break_3_plus_penalty": 0         // No penalty for 3+ iteration breaks (preferred spacing)
     },
     "constraints": {
-        "target_boys_per_group": 2,
-        "target_girls_per_group": 2,
-        "max_hosting_difference": 1,
-        "max_meeting_difference": 2
+        "target_boys_per_group": 2,       // Required number of boys per group (enforced strictly)
+        "target_girls_per_group": 2,      // Required number of girls per group (enforced strictly)
+        "max_hosting_difference": 1,      // Maximum allowed difference in hosting counts between children
+        "max_meeting_difference": 2       // Threshold for meeting count variations (used in validation)
     },
     "algorithm": {
-        "max_attempts": 100000,
-        "backtrack_threshold": 0.7,
-        "solution_search_intensity": 100000,
-        "progress_reporting_interval": 100
+        "max_attempts": 10000,            // Maximum solution attempts before giving up on iteration
+        "backtrack_threshold": 0.7,       // Quality threshold for accepting solutions (0.0-1.0)
+        "solution_search_intensity": 10000,  // How many different host combinations to try
+        "progress_reporting_interval": 100   // How often to log progress during search (every N attempts)
     }
 }
