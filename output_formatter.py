@@ -18,9 +18,9 @@ class OutputFormatter:
                     f.write(f"=== ITERATION {iteration_num} ===\n")
                     
                     for group_num, group in enumerate(groups, 1):
-                        # Write children names separated by commas
+                        # Write children names separated by commas with spaces
                         names = [child.name for child in group.children]
-                        f.write(','.join(names) + '\n')
+                        f.write(', '.join(names) + '\n')
                     
                     f.write('\n')  # Empty line between iterations
             
