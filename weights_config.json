@@ -32,9 +32,9 @@
         "max_meeting_difference": 2
     },
     "algorithm": {
-        "max_attempts": 10000,
+        "max_attempts": 100000,
         "backtrack_threshold": 0.7,
-        "solution_search_intensity": 10000,
+        "solution_search_intensity": 100000,
         "progress_reporting_interval": 100
     }
 }
