@@ -256,10 +256,10 @@ class OutputFormatter:
                 f.write("\n")
 
                 # Write meeting details in vertical list format
-                f.write("MEETING DETAILS FOR NEW ITERATIONS\n")
-                f.write("-" * 20 + "\n")
+                f.write("MEETING DETAILS FOR ALL ITERATIONS\n")
+                f.write("-" * 40 + "\n")
                 f.write(
-                    "Shows how many times each child has been grouped with others:\n\n"
+                    "Shows how many times each child has been grouped with others across all iterations:\n\n"
                 )
 
                 # Sort children by name for consistent output
@@ -268,36 +268,49 @@ class OutputFormatter:
                 for child_name in sorted_child_names:
                     f.write(f"{child_name}:\n")
 
-                    # Get meeting counts from new iterations statistics
-                    meeting_counts = meeting_matrix[child_name].copy()
+                    # Get meeting counts from NEW iterations statistics
+                    new_meeting_counts = meeting_matrix[child_name].copy() if child_name in meeting_matrix else {}
+                    
+                    # Get meeting counts from ALL iterations (including past)
+                    # Find the child object to get complete meeting history
+                    child_obj = next((c for c in children if c.name == child_name), None)
+                    all_meeting_counts = child_obj.meetings.copy() if child_obj else {}
 
-                    # Sort meetings by count (descending) then by name
-                    if meeting_counts:
-                        sorted_meetings = sorted(meeting_counts.items(),
-                                                 key=lambda x: (-x[1], x[0]))
-
-                        # Group by count for better readability
-                        current_count = None
-                        meeting_list = []
-
-                        for other_name, count in sorted_meetings:
-                            if count != current_count:
-                                if meeting_list and current_count is not None:
-                                    f.write(
-                                        f"  {current_count} time{'s' if current_count > 1 else ''}: {', '.join(meeting_list)}\n"
-                                    )
-                                current_count = count
-                                meeting_list = [other_name]
-                            else:
-                                meeting_list.append(other_name)
-
-                        # Write the last group
-                        if meeting_list and current_count is not None:
-                            f.write(
-                                f"  {current_count} time{'s' if current_count > 1 else ''}: {', '.join(meeting_list)}\n"
-                            )
+                    # Write NEW iterations meetings
+                    f.write("  NEW iterations: ")
+                    if new_meeting_counts:
+                        sorted_new_meetings = sorted(new_meeting_counts.items(), key=lambda x: (-x[1], x[0]))
+                        new_groups = {}
+                        for other_name, count in sorted_new_meetings:
+                            if count not in new_groups:
+                                new_groups[count] = []
+                            new_groups[count].append(other_name)
+                        
+                        new_parts = []
+                        for count in sorted(new_groups.keys(), reverse=True):
+                            names_list = ', '.join(sorted(new_groups[count]))
+                            new_parts.append(f"{count} time{'s' if count > 1 else ''}: {names_list}")
+                        f.write('; '.join(new_parts) + "\n")
                     else:
-                        f.write("  No meetings recorded\n")
+                        f.write("No meetings recorded\n")
+
+                    # Write ALL iterations meetings
+                    f.write("  ALL iterations: ")
+                    if all_meeting_counts:
+                        sorted_all_meetings = sorted(all_meeting_counts.items(), key=lambda x: (-x[1], x[0]))
+                        all_groups = {}
+                        for other_name, count in sorted_all_meetings:
+                            if count not in all_groups:
+                                all_groups[count] = []
+                            all_groups[count].append(other_name)
+                        
+                        all_parts = []
+                        for count in sorted(all_groups.keys(), reverse=True):
+                            names_list = ', '.join(sorted(all_groups[count]))
+                            all_parts.append(f"{count} time{'s' if count > 1 else ''}: {names_list}")
+                        f.write('; '.join(all_parts) + "\n")
+                    else:
+                        f.write("No meetings recorded\n")
 
                     f.write("\n")  # Empty line between children
 
