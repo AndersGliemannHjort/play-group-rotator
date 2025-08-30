@@ -11,16 +11,16 @@ class OutputFormatter:
     """Formats and writes output files for group iterations and summaries."""
     
     def write_groups_file(self, all_iterations, filepath):
-        """Write groups output file with tab-delimited format."""
+        """Write groups output file with comma-separated format."""
         try:
             with open(filepath, 'w', encoding='utf-8') as f:
                 for iteration_num, groups in enumerate(all_iterations, 1):
                     f.write(f"=== ITERATION {iteration_num} ===\n")
                     
                     for group_num, group in enumerate(groups, 1):
-                        # Write children names separated by tabs
+                        # Write children names separated by commas
                         names = [child.name for child in group.children]
-                        f.write('\t'.join(names) + '\n')
+                        f.write(','.join(names) + '\n')
                     
                     f.write('\n')  # Empty line between iterations
             
