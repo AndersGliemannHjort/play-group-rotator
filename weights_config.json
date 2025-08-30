@@ -2,11 +2,11 @@
     "description": "Configuration weights for constraint satisfaction algorithm",
     "weights": {
         "gender_balance": 1000000,
-        "hosting_break_balance": 100000,
-        "host_rotation": 100,
-        "group_diversity": 50,
-        "host_fairness": 800,
-        "meeting_fairness": 10
+        "hosting_break_balance": 80000,
+        "host_rotation": 50,
+        "group_diversity": 25,
+        "host_fairness": 400,
+        "meeting_fairness": 5
     },
     "meeting_diversity": {
         "base_weight": 200,
@@ -15,9 +15,9 @@
         "same_gender_meeting_penalty_multiplier": 3.0
     },
     "triplet_diversity": {
-        "base_weight": 5000,
+        "base_weight": 2000,
         "penalty_exponent": 3.5,
-        "max_penalty_cap": 200000,
+        "max_penalty_cap": 80000,
         "triplet_penalty_multiplier": 10.0
     },
     "hosting_break_penalties": {
