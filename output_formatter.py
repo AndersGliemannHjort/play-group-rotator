@@ -302,7 +302,7 @@ class OutputFormatter:
                                 names_list = ', '.join(sorted(cumulative_names))
                                 children_count = len(cumulative_names)
                                 f.write(
-                                    f"  {count} time{'s' if count > 1 else ''} ({children_count}/24): {names_list}\n"
+                                    f"  {count} time{'s' if count > 1 else ''} ({children_count}/23): {names_list}\n"
                                 )
                     else:
                         f.write("  No meetings recorded\n")
@@ -319,7 +319,7 @@ class OutputFormatter:
                                 names_list = ', '.join(sorted(cumulative_names))
                                 children_count = len(cumulative_names)
                                 f.write(
-                                    f"  {count} time{'s' if count > 1 else ''} ({children_count}/24): {names_list}\n"
+                                    f"  {count} time{'s' if count > 1 else ''} ({children_count}/23): {names_list}\n"
                                 )
                     else:
                         f.write("  No past meetings recorded\n")
@@ -336,7 +336,7 @@ class OutputFormatter:
                                 names_list = ', '.join(sorted(cumulative_names))
                                 children_count = len(cumulative_names)
                                 f.write(
-                                    f"  {count} time{'s' if count > 1 else ''} ({children_count}/24): {names_list}\n"
+                                    f"  {count} time{'s' if count > 1 else ''} ({children_count}/23): {names_list}\n"
                                 )
                     else:
                         f.write("  No meetings recorded\n")
