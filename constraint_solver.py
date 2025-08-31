@@ -71,6 +71,7 @@ class ConstraintSolver:
         # Get search intensity parameter
         search_intensity = self.algorithm.get('solution_search_intensity', 1000)
         progress_interval = self.algorithm.get('progress_reporting_interval', 100)
+        console_progress_interval = 5000  # Update console every 5,000 attempts
         
         self.log_debug(f"🔍 COMPREHENSIVE SEARCH MODE: {search_intensity} solution attempts")
         self.log_debug(f"📊 Progress reporting every {progress_interval} attempts")
@@ -119,6 +120,11 @@ class ConstraintSolver:
                 # Progress reporting
                 if attempts % progress_interval == 0:
                     self.log_debug(f"📈 Progress: {attempts}/{search_intensity} attempts, {valid_solutions_found} valid solutions, best score: {best_score:.2f}")
+                
+                # Console progress reporting (every 5,000 attempts)
+                if attempts % console_progress_interval == 0:
+                    percentage = (attempts / search_intensity) * 100
+                    print(f"\r  Creating iteration {iteration_num}... ({percentage:.0f}% complete - {attempts:,}/{search_intensity:,} attempts)", end='', flush=True)
             
             # No early termination - run all attempts to find truly optimal solutions
         
@@ -151,6 +157,9 @@ class ConstraintSolver:
         
         # Final search outcome logging
         self.log_debug(f"\n⏰ SEARCH OUTCOME: Completed all {search_intensity} attempts")
+        
+        # Clear the progress line and show completion
+        print(f"\r  Creating iteration {iteration_num}... (100% complete - {search_intensity:,}/{search_intensity:,} attempts)")
             
         return best_solution
     
