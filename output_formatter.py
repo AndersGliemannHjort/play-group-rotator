@@ -290,65 +290,54 @@ class OutputFormatter:
                         if past_count > 0:
                             past_meeting_counts[other_name] = past_count
 
-                    # Write NEW iterations meetings
+                    # Write NEW iterations meetings with cumulative counting
                     f.write("  NEW iterations:\n")
                     if new_meeting_counts:
-                        sorted_new_meetings = sorted(
-                            new_meeting_counts.items(),
-                            key=lambda x: (-x[1], x[0]))
-                        new_groups = {}
-                        for other_name, count in sorted_new_meetings:
-                            if count not in new_groups:
-                                new_groups[count] = []
-                            new_groups[count].append(other_name)
-
-                        for count in sorted(new_groups.keys(), reverse=True):
-                            names_list = ', '.join(sorted(new_groups[count]))
-                            f.write(
-                                f"  {count} time{'s' if count > 1 else ''}: {names_list}\n"
-                            )
+                        # Create cumulative groups
+                        max_count = max(new_meeting_counts.values())
+                        for count in range(max_count, 0, -1):
+                            # Get all children who met at least 'count' times
+                            cumulative_names = [name for name, meeting_count in new_meeting_counts.items() if meeting_count >= count]
+                            if cumulative_names:
+                                names_list = ', '.join(sorted(cumulative_names))
+                                children_count = len(cumulative_names)
+                                f.write(
+                                    f"  {count} time{'s' if count > 1 else ''} ({children_count}/24): {names_list}\n"
+                                )
                     else:
                         f.write("  No meetings recorded\n")
 
-                    # Write PAST iterations meetings
+                    # Write PAST iterations meetings with cumulative counting
                     f.write("  \n  PAST iterations:\n")
                     if past_meeting_counts:
-                        sorted_past_meetings = sorted(
-                            past_meeting_counts.items(),
-                            key=lambda x: (-x[1], x[0]))
-                        past_groups = {}
-                        for other_name, count in sorted_past_meetings:
-                            if count not in past_groups:
-                                past_groups[count] = []
-                            past_groups[count].append(other_name)
-
-                        for count in sorted(past_groups.keys(), reverse=True):
-                            names_list = ', '.join(sorted(past_groups[count]))
-                            children_count = len(past_groups[count])
-                            f.write(
-                                f"  {count} time{'s' if count > 1 else ''} ({children_count}/24): {names_list}\n"
-                            )
+                        # Create cumulative groups
+                        max_count = max(past_meeting_counts.values())
+                        for count in range(max_count, 0, -1):
+                            # Get all children who met at least 'count' times
+                            cumulative_names = [name for name, meeting_count in past_meeting_counts.items() if meeting_count >= count]
+                            if cumulative_names:
+                                names_list = ', '.join(sorted(cumulative_names))
+                                children_count = len(cumulative_names)
+                                f.write(
+                                    f"  {count} time{'s' if count > 1 else ''} ({children_count}/24): {names_list}\n"
+                                )
                     else:
                         f.write("  No past meetings recorded\n")
 
-                    # Write ALL iterations meetings
+                    # Write ALL iterations meetings with cumulative counting
                     f.write("  \n  ALL iterations:\n")
                     if all_meeting_counts:
-                        sorted_all_meetings = sorted(
-                            all_meeting_counts.items(),
-                            key=lambda x: (-x[1], x[0]))
-                        all_groups = {}
-                        for other_name, count in sorted_all_meetings:
-                            if count not in all_groups:
-                                all_groups[count] = []
-                            all_groups[count].append(other_name)
-
-                        for count in sorted(all_groups.keys(), reverse=True):
-                            names_list = ', '.join(sorted(all_groups[count]))
-                            children_count = len(all_groups[count])
-                            f.write(
-                                f"  {count} time{'s' if count > 1 else ''} ({children_count}/24): {names_list}\n"
-                            )
+                        # Create cumulative groups
+                        max_count = max(all_meeting_counts.values())
+                        for count in range(max_count, 0, -1):
+                            # Get all children who met at least 'count' times
+                            cumulative_names = [name for name, meeting_count in all_meeting_counts.items() if meeting_count >= count]
+                            if cumulative_names:
+                                names_list = ', '.join(sorted(cumulative_names))
+                                children_count = len(cumulative_names)
+                                f.write(
+                                    f"  {count} time{'s' if count > 1 else ''} ({children_count}/24): {names_list}\n"
+                                )
                     else:
                         f.write("  No meetings recorded\n")
 
