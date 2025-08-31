@@ -675,18 +675,18 @@ class ConstraintSolver:
         # Get meeting diversity configuration
         meeting_config = self.config.get('meeting_diversity', {
             'base_weight': 50,
-            'penalty_exponent': 2.5,
-            'max_penalty_cap': 5000,
+            'progression_type': 'gentle_linear',
+            'progression_multiplier': 0.2,
             'same_gender_meeting_penalty_multiplier': 3.0
         })
         
         base_weight = meeting_config['base_weight']
-        exponent = meeting_config['penalty_exponent']
-        max_cap = meeting_config['max_penalty_cap']
+        progression_type = meeting_config.get('progression_type', 'gentle_linear')
+        progression_multiplier = meeting_config.get('progression_multiplier', 0.2)
         same_gender_multiplier = meeting_config['same_gender_meeting_penalty_multiplier']
         
         self.log_debug(f"📋 Configuration loaded:")
-        self.log_debug(f"   base_weight={base_weight}, exponent={exponent}, max_cap={max_cap}")
+        self.log_debug(f"   base_weight={base_weight}, progression_type={progression_type}, progression_multiplier={progression_multiplier}")
         self.log_debug(f"   same_gender_multiplier={same_gender_multiplier}")
         self.log_debug(f"   Full config object: {meeting_config}")
         
@@ -723,8 +723,8 @@ class ConstraintSolver:
                     if meeting_count == 0:
                         self.log_debug(f"   👥 {child1.name}-{child2.name} ({gender_emoji} {gender_type}): No previous meetings (penalty: 0)")
                     else:
-                        # Calculate base penalty: base_weight * (meeting_count ^ exponent)
-                        base_penalty = base_weight * (meeting_count ** exponent)
+                        # Calculate base penalty using gentle linear progression: base_weight * meeting_count * (1 + meeting_count * progression_multiplier)
+                        base_penalty = base_weight * meeting_count * (1 + meeting_count * progression_multiplier)
                         
                         # Apply gender multiplier if same-gender
                         if same_gender:
@@ -738,17 +738,12 @@ class ConstraintSolver:
                             cross_gender_penalty_total += penalty
                             multiplier_text = " (cross-gender)"
                         
-                        # Apply cap if specified
-                        original_penalty = penalty
-                        if max_cap and penalty > max_cap:
-                            penalty = max_cap
-                            self.log_debug(f"   ⚠️  Penalty capped: {original_penalty:.1f} → {penalty:.1f}")
-                        
                         total_penalty += penalty
                         penalties_applied += 1
                         penalty_details.append((child1.name, child2.name, meeting_count, penalty, same_gender))
                         
-                        formula = f"{base_weight} × {meeting_count}^{exponent}{multiplier_text} = {penalty:.1f}"
+                        linear_factor = 1 + meeting_count * progression_multiplier
+                        formula = f"{base_weight} × {meeting_count} × {linear_factor:.1f}{multiplier_text} = {penalty:.1f}"
                         self.log_debug(f"   🚨 {child1.name}-{child2.name} ({gender_emoji} {gender_type}): {meeting_count} meetings → {formula}")
         
         # Summary logging
@@ -766,7 +761,8 @@ class ConstraintSolver:
             for child1, child2, count, penalty, is_same_gender in penalty_details[:10]:  # Show top 10
                 gender_type = "same-gender" if is_same_gender else "cross-gender"
                 multiplier_part = f" × {same_gender_multiplier}" if is_same_gender else ""
-                formula = f"{base_weight} × {count}^{exponent}{multiplier_part} = {penalty:.1f}"
+                linear_factor = 1 + count * progression_multiplier
+                formula = f"{base_weight} × {count} × {linear_factor:.1f}{multiplier_part} = {penalty:.1f}"
                 self.log_debug(f"   {child1}-{child2} ({gender_type}): {count} meetings → {formula}")
         else:
             self.log_debug("✅ No previous meetings found, no penalties applied")
