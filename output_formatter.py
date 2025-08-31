@@ -316,8 +316,9 @@ class OutputFormatter:
 
                         for count in sorted(all_groups.keys(), reverse=True):
                             names_list = ', '.join(sorted(all_groups[count]))
+                            children_count = len(all_groups[count])
                             f.write(
-                                f"  {count} time{'s' if count > 1 else ''}: {names_list}\n"
+                                f"  {count} time{'s' if count > 1 else ''} ({children_count}/24): {names_list}\n"
                             )
                     else:
                         f.write("  No meetings recorded\n")
