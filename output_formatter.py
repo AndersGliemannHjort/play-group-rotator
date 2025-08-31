@@ -281,6 +281,14 @@ class OutputFormatter:
                         (c for c in children if c.name == child_name), None)
                     all_meeting_counts = child_obj.meetings.copy(
                     ) if child_obj else {}
+                    
+                    # Calculate PAST iterations by subtracting NEW from ALL
+                    past_meeting_counts = {}
+                    for other_name, all_count in all_meeting_counts.items():
+                        new_count = new_meeting_counts.get(other_name, 0)
+                        past_count = all_count - new_count
+                        if past_count > 0:
+                            past_meeting_counts[other_name] = past_count
 
                     # Write NEW iterations meetings
                     f.write("  NEW iterations:\n")
@@ -301,6 +309,27 @@ class OutputFormatter:
                             )
                     else:
                         f.write("  No meetings recorded\n")
+
+                    # Write PAST iterations meetings
+                    f.write("  \n  PAST iterations:\n")
+                    if past_meeting_counts:
+                        sorted_past_meetings = sorted(
+                            past_meeting_counts.items(),
+                            key=lambda x: (-x[1], x[0]))
+                        past_groups = {}
+                        for other_name, count in sorted_past_meetings:
+                            if count not in past_groups:
+                                past_groups[count] = []
+                            past_groups[count].append(other_name)
+
+                        for count in sorted(past_groups.keys(), reverse=True):
+                            names_list = ', '.join(sorted(past_groups[count]))
+                            children_count = len(past_groups[count])
+                            f.write(
+                                f"  {count} time{'s' if count > 1 else ''} ({children_count}/24): {names_list}\n"
+                            )
+                    else:
+                        f.write("  No past meetings recorded\n")
 
                     # Write ALL iterations meetings
                     f.write("  \n  ALL iterations:\n")
