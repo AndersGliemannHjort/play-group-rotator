@@ -299,11 +299,18 @@ class OutputFormatter:
                             # Get all children who met at least 'count' times
                             cumulative_names = [name for name, meeting_count in new_meeting_counts.items() if meeting_count >= count]
                             if cumulative_names:
-                                names_list = ', '.join(sorted(cumulative_names))
                                 children_count = len(cumulative_names)
-                                f.write(
-                                    f"  {count} time{'s' if count > 1 else ''} ({children_count}/23): {names_list}\n"
-                                )
+                                if children_count == 23:
+                                    # When all children have been met, use summary message
+                                    f.write(
+                                        f"  {count} time{'s' if count > 1 else ''} ({children_count}/23): Meet all children {count} time{'s' if count > 1 else ''}\n"
+                                    )
+                                else:
+                                    # Normal case - list the names
+                                    names_list = ', '.join(sorted(cumulative_names))
+                                    f.write(
+                                        f"  {count} time{'s' if count > 1 else ''} ({children_count}/23): {names_list}\n"
+                                    )
                     else:
                         f.write("  No meetings recorded\n")
 
@@ -316,11 +323,18 @@ class OutputFormatter:
                             # Get all children who met at least 'count' times
                             cumulative_names = [name for name, meeting_count in past_meeting_counts.items() if meeting_count >= count]
                             if cumulative_names:
-                                names_list = ', '.join(sorted(cumulative_names))
                                 children_count = len(cumulative_names)
-                                f.write(
-                                    f"  {count} time{'s' if count > 1 else ''} ({children_count}/23): {names_list}\n"
-                                )
+                                if children_count == 23:
+                                    # When all children have been met, use summary message
+                                    f.write(
+                                        f"  {count} time{'s' if count > 1 else ''} ({children_count}/23): Meet all children {count} time{'s' if count > 1 else ''}\n"
+                                    )
+                                else:
+                                    # Normal case - list the names
+                                    names_list = ', '.join(sorted(cumulative_names))
+                                    f.write(
+                                        f"  {count} time{'s' if count > 1 else ''} ({children_count}/23): {names_list}\n"
+                                    )
                     else:
                         f.write("  No past meetings recorded\n")
 
@@ -333,11 +347,18 @@ class OutputFormatter:
                             # Get all children who met at least 'count' times
                             cumulative_names = [name for name, meeting_count in all_meeting_counts.items() if meeting_count >= count]
                             if cumulative_names:
-                                names_list = ', '.join(sorted(cumulative_names))
                                 children_count = len(cumulative_names)
-                                f.write(
-                                    f"  {count} time{'s' if count > 1 else ''} ({children_count}/23): {names_list}\n"
-                                )
+                                if children_count == 23:
+                                    # When all children have been met, use summary message
+                                    f.write(
+                                        f"  {count} time{'s' if count > 1 else ''} ({children_count}/23): Meet all children {count} time{'s' if count > 1 else ''}\n"
+                                    )
+                                else:
+                                    # Normal case - list the names
+                                    names_list = ', '.join(sorted(cumulative_names))
+                                    f.write(
+                                        f"  {count} time{'s' if count > 1 else ''} ({children_count}/23): {names_list}\n"
+                                    )
                     else:
                         f.write("  No meetings recorded\n")
 
