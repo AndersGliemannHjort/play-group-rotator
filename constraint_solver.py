@@ -534,7 +534,7 @@ class ConstraintSolver:
         }
     
     def _build_group_around_host(self, host, available_children):
-        """Build a 2B+2G group around the given host."""
+        """Build a 2B+2G group around the given host using meeting-aware selection."""
         from group_optimizer import Group
         
         # Start with the host
@@ -552,24 +552,55 @@ class ConstraintSolver:
         available_boys = [child for child in available_children if child.is_boy]
         available_girls = [child for child in available_children if child.is_girl]
         
-        # Shuffle for randomization
-        random.shuffle(available_boys)
-        random.shuffle(available_girls)
+        # Smart selection: prefer children with fewer meetings with host and current group
+        def get_meeting_score(candidate_child, current_group):
+            """Calculate meeting score - lower is better (fewer previous meetings)."""
+            total_meetings = 0
+            for group_child in current_group:
+                # Get meeting count between candidate and each child in current group
+                meeting_count = candidate_child.meetings.get(group_child.name, 0)
+                total_meetings += meeting_count
+            return total_meetings
         
-        # Add boys
+        # Select boys intelligently
         for _ in range(min(boys_needed, len(available_boys))):
-            group_children.append(available_boys.pop(0))
+            if available_boys:
+                # Score each available boy by total meetings with current group
+                boy_scores = [(boy, get_meeting_score(boy, group_children)) for boy in available_boys]
+                # Sort by score (lowest first) then by name for consistency
+                boy_scores.sort(key=lambda x: (x[1], x[0].name))
+                
+                # Select the boy with lowest meeting score
+                selected_boy = boy_scores[0][0]
+                group_children.append(selected_boy)
+                available_boys.remove(selected_boy)
         
-        # Add girls
+        # Select girls intelligently  
         for _ in range(min(girls_needed, len(available_girls))):
-            group_children.append(available_girls.pop(0))
+            if available_girls:
+                # Score each available girl by total meetings with current group
+                girl_scores = [(girl, get_meeting_score(girl, group_children)) for girl in available_girls]
+                # Sort by score (lowest first) then by name for consistency
+                girl_scores.sort(key=lambda x: (x[1], x[0].name))
+                
+                # Select the girl with lowest meeting score
+                selected_girl = girl_scores[0][0]
+                group_children.append(selected_girl)
+                available_girls.remove(selected_girl)
         
         # Fill remaining spots if needed (should not happen with 12B+12G)
         while len(group_children) < 4:
-            if available_boys:
-                group_children.append(available_boys.pop(0))
-            elif available_girls:
-                group_children.append(available_girls.pop(0))
+            remaining = available_boys + available_girls
+            if remaining:
+                # Score remaining children and pick best
+                remaining_scores = [(child, get_meeting_score(child, group_children)) for child in remaining]
+                remaining_scores.sort(key=lambda x: (x[1], x[0].name))
+                selected_child = remaining_scores[0][0]
+                group_children.append(selected_child)
+                if selected_child in available_boys:
+                    available_boys.remove(selected_child)
+                else:
+                    available_girls.remove(selected_child)
             else:
                 break  # No more children available
         
