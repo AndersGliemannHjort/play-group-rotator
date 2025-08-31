@@ -83,6 +83,11 @@ class ConstraintSolver:
         valid_solutions_found = 0
         attempts = 0
         
+        # Enhanced tracking for logging analysis
+        top_solutions = []  # Track top 5 solutions
+        termination_reason = "max_attempts_reached"
+        score_improvements = 0
+        
         # Comprehensive search: try many solutions and pick the absolute best
         while attempts < search_intensity:
             attempts += 1
@@ -97,7 +102,19 @@ class ConstraintSolver:
                 if score > best_score:
                     best_score = score
                     best_solution = solution
+                    score_improvements += 1
                     self.log_debug(f"🏆 NEW BEST SOLUTION found at attempt {attempts}: score={score:.2f}")
+                    
+                    # Track top solutions for analysis
+                    top_solutions.append({
+                        'attempt': attempts,
+                        'score': score,
+                        'solution': solution
+                    })
+                    # Keep only top 5
+                    top_solutions.sort(key=lambda x: x['score'], reverse=True)
+                    if len(top_solutions) > 5:
+                        top_solutions = top_solutions[:5]
                 
                 # Progress reporting
                 if attempts % progress_interval == 0:
@@ -107,21 +124,45 @@ class ConstraintSolver:
             # Use a very high threshold to encourage comprehensive search
             perfect_score = self._get_perfect_score()
             if best_solution and best_score >= 0.99 * perfect_score:
-                self.log_debug(f"🎯 EARLY TERMINATION: Near-perfect solution found (score: {best_score:.2f}, {(best_score/perfect_score)*100:.1f}% of perfect)")
+                termination_reason = "early_termination_near_perfect"
+                threshold_percentage = (best_score/perfect_score)*100
+                self.log_debug(f"🎯 EARLY TERMINATION: Near-perfect solution found (score: {best_score:.2f}, {threshold_percentage:.1f}% of perfect)")
+                self.log_debug(f"   Termination threshold: 99.0% achieved at attempt {attempts}/{search_intensity}")
                 break
         
-        # Final search summary
+        # Enhanced search analysis and logging
         self.log_debug(f"\n=== COMPREHENSIVE SEARCH COMPLETED ===")
-        self.log_debug(f"Total attempts: {attempts}")
-        self.log_debug(f"Valid solutions found: {valid_solutions_found}")
-        self.log_debug(f"Success rate: {(valid_solutions_found/attempts)*100:.1f}%")
-        self.log_debug(f"Best score achieved: {best_score:.2f}")
+        self.log_debug(f"🔍 SEARCH STATISTICS:")
+        self.log_debug(f"   Total attempts: {attempts}/{search_intensity}")
+        self.log_debug(f"   Valid solutions found: {valid_solutions_found}")
+        self.log_debug(f"   Success rate: {(valid_solutions_found/attempts)*100:.1f}%")
+        self.log_debug(f"   Score improvements: {score_improvements}")
+        self.log_debug(f"   Termination reason: {termination_reason}")
+        self.log_debug(f"   Best score achieved: {best_score:.2f}")
         
         if best_solution:
             perfect_score = self._get_perfect_score()
             quality_percentage = (best_score / perfect_score) * 100
-            self.log_debug(f"Solution quality: {quality_percentage:.1f}% of theoretical perfect score")
+            self.log_debug(f"   Solution quality: {quality_percentage:.1f}% of theoretical perfect score")
+            
+            # Enhanced perfect score breakdown
+            self._log_perfect_score_breakdown(perfect_score)
+            
+            # Top solutions analysis
+            self._log_top_solutions_analysis(top_solutions)
+            
+            # Meeting distribution analysis for best solution
+            self._log_meeting_distribution_analysis(best_solution)
+            
+            # Penalty effectiveness analysis
+            self._log_penalty_effectiveness_analysis(best_solution, iteration_num, previous_iterations)
         
+        # Final search outcome logging
+        if termination_reason == "early_termination_near_perfect":
+            self.log_debug(f"\n✅ SEARCH OUTCOME: Early termination due to near-perfect solution")
+        else:
+            self.log_debug(f"\n⏰ SEARCH OUTCOME: Completed all {search_intensity} attempts")
+            
         return best_solution
     
     def _generate_candidate_solution(self, boys, girls, iteration_num, previous_iterations):
@@ -999,3 +1040,99 @@ class ConstraintSolver:
                 self.weights['host_rotation'] +           # Perfect host rotation
                 self.weights['host_fairness'] +           # Perfect host fairness
                 self.weights['meeting_fairness'])         # Perfect meeting fairness
+    
+    def _log_perfect_score_breakdown(self, perfect_score):
+        """Log detailed breakdown of perfect score calculation."""
+        self.log_debug(f"\n🎯 PERFECT SCORE BREAKDOWN:")
+        self.log_debug(f"   Gender balance contribution: {self.weights['gender_balance'] * 6:,.0f} ({self.weights['gender_balance']:,} × 6 groups)")
+        self.log_debug(f"   Break balance contribution: {self.weights['hosting_break_balance']:,.0f}")
+        self.log_debug(f"   Host rotation contribution: {self.weights['host_rotation']:,.0f}")
+        self.log_debug(f"   Host fairness contribution: {self.weights['host_fairness']:,.0f}")
+        self.log_debug(f"   Meeting fairness contribution: {self.weights['meeting_fairness']:,.0f}")
+        self.log_debug(f"   TOTAL PERFECT SCORE: {perfect_score:,.2f}")
+    
+    def _log_top_solutions_analysis(self, top_solutions):
+        """Log analysis of top 5 solutions found."""
+        self.log_debug(f"\n📊 TOP SOLUTIONS ANALYSIS:")
+        if not top_solutions:
+            self.log_debug(f"   No valid solutions found")
+            return
+            
+        for i, solution_data in enumerate(top_solutions[:5]):
+            rank = i + 1
+            attempt = solution_data['attempt']
+            score = solution_data['score']
+            self.log_debug(f"   #{rank}: Attempt {attempt}, Score {score:.2f}")
+            
+        if len(top_solutions) > 1:
+            best_score = top_solutions[0]['score']
+            second_best = top_solutions[1]['score']
+            score_gap = best_score - second_best
+            self.log_debug(f"   Score gap between #1 and #2: {score_gap:.2f} points")
+    
+    def _log_meeting_distribution_analysis(self, solution):
+        """Analyze and log meeting count distribution in the solution."""
+        self.log_debug(f"\n🤝 MEETING DISTRIBUTION ANALYSIS:")
+        
+        # Count meetings for each pair in this solution
+        pair_meetings = {}
+        for group in solution:
+            for i in range(len(group.children)):
+                for j in range(i + 1, len(group.children)):
+                    child1 = group.children[i]
+                    child2 = group.children[j]
+                    
+                    # Get historical meeting count
+                    meeting_count = 0
+                    if child2.name in child1.meetings:
+                        meeting_count = child1.meetings[child2.name]
+                    meeting_count += 1  # Add current meeting
+                    
+                    pair_key = tuple(sorted([child1.name, child2.name]))
+                    pair_meetings[pair_key] = meeting_count
+        
+        # Analyze distribution
+        meeting_counts = list(pair_meetings.values())
+        if meeting_counts:
+            min_meetings = min(meeting_counts)
+            max_meetings = max(meeting_counts)
+            avg_meetings = sum(meeting_counts) / len(meeting_counts)
+            
+            self.log_debug(f"   Total pairs in solution: {len(meeting_counts)}")
+            self.log_debug(f"   Meeting count range: {min_meetings} to {max_meetings} (spread: {max_meetings - min_meetings})")
+            self.log_debug(f"   Average meetings per pair: {avg_meetings:.2f}")
+            
+            # Show worst offenders
+            sorted_pairs = sorted(pair_meetings.items(), key=lambda x: x[1], reverse=True)
+            self.log_debug(f"   🚨 HIGHEST MEETING COUNTS:")
+            for pair, count in sorted_pairs[:5]:
+                self.log_debug(f"      {pair[0]}-{pair[1]}: {count} meetings")
+    
+    def _log_penalty_effectiveness_analysis(self, solution, iteration_num, previous_iterations):
+        """Analyze how effective penalties are at preventing poor meeting patterns."""
+        self.log_debug(f"\n⚖️ PENALTY EFFECTIVENESS ANALYSIS:")
+        
+        # Calculate actual penalties for this solution
+        progressive_penalty = self._calculate_progressive_meeting_penalty(solution)
+        triplet_penalty = self._calculate_triplet_penalty(solution)
+        
+        # Get meeting diversity configuration
+        meeting_config = self.config.get('meeting_diversity', {})
+        base_weight = meeting_config.get('base_weight', 50)
+        progression_multiplier = meeting_config.get('progression_multiplier', 0.2)
+        
+        self.log_debug(f"   Progressive meeting penalty: {progressive_penalty:.2f}")
+        self.log_debug(f"   Triplet penalty: {triplet_penalty:.2f}")
+        self.log_debug(f"   Total penalties: {progressive_penalty + triplet_penalty:.2f}")
+        
+        # Analyze penalty scale relative to other constraints
+        total_score = self._evaluate_solution(solution, iteration_num, previous_iterations)
+        penalty_percentage = ((progressive_penalty + triplet_penalty) / abs(total_score)) * 100
+        
+        self.log_debug(f"   Penalties as % of total score: {penalty_percentage:.3f}%")
+        self.log_debug(f"   Penalty configuration: base_weight={base_weight}, progression_multiplier={progression_multiplier}")
+        
+        # Compare penalty scale to constraint weights
+        gender_weight = self.weights.get('gender_balance', 1000000)
+        penalty_vs_gender = (progressive_penalty + triplet_penalty) / gender_weight * 100
+        self.log_debug(f"   Penalties vs Gender Balance weight: {penalty_vs_gender:.4f}%")
