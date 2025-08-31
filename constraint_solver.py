@@ -120,15 +120,7 @@ class ConstraintSolver:
                 if attempts % progress_interval == 0:
                     self.log_debug(f"📈 Progress: {attempts}/{search_intensity} attempts, {valid_solutions_found} valid solutions, best score: {best_score:.2f}")
             
-            # Early termination only if we have a near-perfect solution
-            # Use a very high threshold to encourage comprehensive search
-            perfect_score = self._get_perfect_score()
-            if best_solution and best_score >= 0.99 * perfect_score:
-                termination_reason = "early_termination_near_perfect"
-                threshold_percentage = (best_score/perfect_score)*100
-                self.log_debug(f"🎯 EARLY TERMINATION: Near-perfect solution found (score: {best_score:.2f}, {threshold_percentage:.1f}% of perfect)")
-                self.log_debug(f"   Termination threshold: 99.0% achieved at attempt {attempts}/{search_intensity}")
-                break
+            # No early termination - run all attempts to find truly optimal solutions
         
         # Enhanced search analysis and logging
         self.log_debug(f"\n=== COMPREHENSIVE SEARCH COMPLETED ===")
@@ -158,10 +150,7 @@ class ConstraintSolver:
             self._log_penalty_effectiveness_analysis(best_solution, iteration_num, previous_iterations)
         
         # Final search outcome logging
-        if termination_reason == "early_termination_near_perfect":
-            self.log_debug(f"\n✅ SEARCH OUTCOME: Early termination due to near-perfect solution")
-        else:
-            self.log_debug(f"\n⏰ SEARCH OUTCOME: Completed all {search_intensity} attempts")
+        self.log_debug(f"\n⏰ SEARCH OUTCOME: Completed all {search_intensity} attempts")
             
         return best_solution
     
