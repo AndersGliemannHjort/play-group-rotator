@@ -1,214 +1,149 @@
-"""
-Group Optimizer Module
-Implements the weighted constraint satisfaction algorithm for group optimization.
+"""Group optimization orchestration.
+
+Thin coordination layer between the CP-SAT solver and the rest of the system.
+Owns the Group data class, manages child statistics updates, and validates output.
 """
 
-import json
-import os
-import random
-from constraint_solver import ConstraintSolver
+from itertools import combinations
 
 
 class Group:
-    """Represents a group of children."""
-    
+    """A play group of 4 children. The first child is the host."""
+
     def __init__(self, children):
         self.children = children
         self.host = children[0] if children else None
-    
+
     def get_boys(self):
-        """Get list of boys in the group."""
-        return [child for child in self.children if child.is_boy]
-    
+        return [c for c in self.children if c.is_boy]
+
     def get_girls(self):
-        """Get list of girls in the group."""
-        return [child for child in self.children if child.is_girl]
-    
+        return [c for c in self.children if c.is_girl]
+
     def __str__(self):
-        names = [child.name for child in self.children]
-        return f"Group(host={self.host.name if self.host else 'None'}, children={names})"
+        names = [c.name for c in self.children]
+        host = self.host.name if self.host else "None"
+        return f"Group(host={host}, members={names})"
 
 
 class GroupOptimizer:
-    """Optimizes child group arrangements using weighted constraint satisfaction."""
-    
+    """Orchestrates iterative play group generation."""
+
     def __init__(self):
-        self.config = self._load_config()
-        self.solver = ConstraintSolver(self.config)
+        from solver import PlayGroupSolver
+
+        self.solver = PlayGroupSolver()
         self.warnings = []
-    
-    def _load_config(self):
-        """Load configuration from weights_config.json."""
-        config_path = os.path.join(os.path.dirname(__file__), 'weights_config.json')
-        
-        try:
-            with open(config_path, 'r') as f:
-                return json.load(f)
-        except FileNotFoundError:
-            # Default configuration if file not found
-            return {
-                "weights": {
-                    "gender_balance": 1000,
-                    "host_rotation": 100,
-                    "group_diversity": 50,
-                    "host_fairness": 25,
-                    "meeting_fairness": 10
-                },
-                "constraints": {
-                    "target_boys_per_group": 2,
-                    "target_girls_per_group": 2,
-                    "max_hosting_difference": 1,
-                    "max_meeting_difference": 2
-                },
-                "algorithm": {
-                    "max_attempts": 10000,
-                    "backtrack_threshold": 0.7
-                }
-            }
-    
+        self.triplet_history = {}
+        self.quartet_history = {}
+
     def create_iteration(self, children, iteration_num, previous_iterations):
-        """Create groups for a specific iteration."""
-        print(f"  Attempting to create iteration {iteration_num} with constraint satisfaction...")
-        
-        # Use constraint solver to find optimal grouping
-        groups = self.solver.solve(children, iteration_num, previous_iterations)
-        
+        """Create optimal groups for one iteration and update child statistics."""
+        groups = self.solver.solve(
+            children,
+            iteration_num,
+            self.triplet_history,
+            self.quartet_history,
+        )
         if not groups:
-            self.warnings.append(f"Iteration {iteration_num}: Could not satisfy all constraints")
+            self.warnings.append(
+                f"Iteration {iteration_num}: no feasible solution found"
+            )
             return None
-        
-        # Additional high-level validation
-        total_children_in_groups = sum(len(group.children) for group in groups)
-        expected_total = len(children)
-        
-        if total_children_in_groups != expected_total:
-            error_msg = f"Critical error: Total children in groups ({total_children_in_groups}) != expected ({expected_total})"
-            self.warnings.append(f"Iteration {iteration_num}: {error_msg}")
-            print(f"ERROR: {error_msg}")
+
+        if not self._validate(groups, iteration_num):
             return None
-        
-        # Update child statistics
-        self._update_child_statistics(children, groups, iteration_num)
-        
-        # Update centralized triplet history in solver
-        for group in groups:
-            self.solver.add_triplet_to_history(group.children, iteration_num)
-        
-        # Validate groups
-        if not self._validate_groups(groups, iteration_num):
-            return None
-        
+
+        self._update_statistics(groups, iteration_num)
         return groups
-    
-    def _update_child_statistics(self, children, groups, iteration_num):
-        """Update hosting counts and meeting records for children."""
-        from itertools import combinations
-        
+
+    def process_past_iterations(self, children, past_iterations):
+        """Replay past iterations to rebuild child statistics."""
+        for iteration_num, groups in enumerate(past_iterations, 1):
+            self._update_statistics(groups, iteration_num)
+
+    def _update_statistics(self, groups, iteration_num):
         for group in groups:
-            # Update host count
             if group.host:
                 group.host.hosting_count += 1
                 group.host.hosting_iterations.append(iteration_num)
-            
-            # Update meetings - each child meets every other child in their group
-            for i, child1 in enumerate(group.children):
-                for j, child2 in enumerate(group.children):
-                    if i != j:
-                        # Increment meeting count for this pair
-                        if child2.name in child1.meetings:
-                            child1.meetings[child2.name] += 1
-                        else:
-                            child1.meetings[child2.name] = 1
-            
-    
-    def _validate_groups(self, groups, iteration_num):
-        """Validate that groups meet basic requirements."""
+            for c1 in group.children:
+                for c2 in group.children:
+                    if c1 is not c2:
+                        c1.meetings[c2.name] = (
+                            c1.meetings.get(c2.name, 0) + 1
+                        )
+                        c1.meeting_iterations.setdefault(
+                            c2.name, []
+                        ).append(iteration_num)
+
+            names = sorted(c.name for c in group.children)
+            for tri in combinations(names, 3):
+                self.triplet_history.setdefault(tri, []).append(
+                    iteration_num
+                )
+            self.quartet_history.setdefault(tuple(names), []).append(
+                iteration_num
+            )
+
+    def _validate(self, groups, iteration_num):
         if len(groups) != 6:
-            self.warnings.append(f"Iteration {iteration_num}: Expected 6 groups, got {len(groups)}")
+            self.warnings.append(
+                f"Iteration {iteration_num}: expected 6 groups, got {len(groups)}"
+            )
             return False
-        
-        total_children = sum(len(group.children) for group in groups)
-        if total_children != 24:
-            self.warnings.append(f"Iteration {iteration_num}: Expected 24 children total, got {total_children}")
-            return False
-        
-        for i, group in enumerate(groups, 1):
-            if len(group.children) != 4:
-                self.warnings.append(f"Iteration {iteration_num}, Group {i}: Expected 4 children, got {len(group.children)}")
+
+        all_names = []
+        for i, g in enumerate(groups, 1):
+            if len(g.children) != 4:
+                self.warnings.append(
+                    f"Iteration {iteration_num}, group {i}: "
+                    f"expected 4 children, got {len(g.children)}"
+                )
                 return False
-            
-            boys = len(group.get_boys())
-            girls = len(group.get_girls())
-            
-            # Check gender balance (highest priority constraint)
-            if abs(boys - 2) > 1 or abs(girls - 2) > 1:
-                self.warnings.append(f"Iteration {iteration_num}, Group {i}: Poor gender balance ({boys}B, {girls}G)")
-        
+            b, gl = len(g.get_boys()), len(g.get_girls())
+            if b != 2 or gl != 2:
+                self.warnings.append(
+                    f"Iteration {iteration_num}, group {i}: "
+                    f"{b}B+{gl}G (expected 2B+2G)"
+                )
+            all_names.extend(c.name for c in g.children)
+
+        if len(all_names) != len(set(all_names)):
+            self.warnings.append(
+                f"Iteration {iteration_num}: duplicate children in groups"
+            )
+            return False
+        if len(all_names) != 24:
+            self.warnings.append(
+                f"Iteration {iteration_num}: "
+                f"expected 24 children, got {len(all_names)}"
+            )
+            return False
         return True
-    
-    def process_past_iterations(self, children, past_iterations):
-        """Process past iterations to update child statistics and tracking data."""
-        for iteration_num, groups in enumerate(past_iterations, 1):
-            # Update child statistics for this past iteration
-            self._update_child_statistics(children, groups, iteration_num)
-            
-            # Update centralized triplet history in solver for past iterations
-            for group in groups:
-                self.solver.add_triplet_to_history(group.children, iteration_num)
-    
-    def get_statistics(self, children):
-        """Get statistics about hosting and meetings for all children."""
-        stats = {
-            'hosting_counts': {},
-            'meeting_matrix': {},
-            'total_meetings': {}
-        }
-        
-        for child in children:
-            stats['hosting_counts'][child.name] = child.hosting_count
-            stats['meeting_matrix'][child.name] = list(child.meetings)
-            stats['total_meetings'][child.name] = len(child.meetings)
-        
-        return stats
-    
+
     def get_new_iterations_statistics(self, new_iterations, past_iteration_count):
-        """Get statistics for only the new iterations."""
-        stats = {
-            'hosting_counts': {},
-            'meeting_matrix': {},
-            'hosting_iterations': {}
-        }
-        
-        # Initialize all children with zero counts
-        all_children = set()
+        """Compute hosting and meeting stats for new iterations only."""
+        stats = {"hosting_counts": {}, "meeting_matrix": {}}
+
+        all_names = set()
         for groups in new_iterations:
             for group in groups:
                 for child in group.children:
-                    all_children.add(child.name)
-        
-        for child_name in all_children:
-            stats['hosting_counts'][child_name] = 0
-            stats['meeting_matrix'][child_name] = {}
-            stats['hosting_iterations'][child_name] = []
-        
-        # Calculate statistics only from new iterations
-        for iteration_num, groups in enumerate(new_iterations, 1):
-            absolute_iteration_num = past_iteration_count + iteration_num
-            
+                    all_names.add(child.name)
+
+        for name in all_names:
+            stats["hosting_counts"][name] = 0
+            stats["meeting_matrix"][name] = {}
+
+        for groups in new_iterations:
             for group in groups:
-                # Count hosting for first child (host)
                 if group.host:
-                    stats['hosting_counts'][group.host.name] += 1
-                    stats['hosting_iterations'][group.host.name].append(absolute_iteration_num)
-                
-                # Count meetings between all children in the group
-                for i, child1 in enumerate(group.children):
-                    for j, child2 in enumerate(group.children):
-                        if i != j:
-                            child2_name = child2.name
-                            if child2_name in stats['meeting_matrix'][child1.name]:
-                                stats['meeting_matrix'][child1.name][child2_name] += 1
-                            else:
-                                stats['meeting_matrix'][child1.name][child2_name] = 1
-        
+                    stats["hosting_counts"][group.host.name] += 1
+                for c1 in group.children:
+                    for c2 in group.children:
+                        if c1 is not c2:
+                            d = stats["meeting_matrix"][c1.name]
+                            d[c2.name] = d.get(c2.name, 0) + 1
+
         return stats

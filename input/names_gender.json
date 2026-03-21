@@ -1,0 +1,30 @@
+{
+  "format": "group-scheduler-children",
+  "version": 1,
+  "children": [
+    { "name": "Hannah", "gender": "girl" },
+    { "name": "Ava", "gender": "girl" },
+    { "name": "Kaya Olivia", "gender": "girl" },
+    { "name": "Norman", "gender": "boy" },
+    { "name": "Bille", "gender": "boy" },
+    { "name": "Tobias", "gender": "boy" },
+    { "name": "Benjamin", "gender": "boy" },
+    { "name": "Emir", "gender": "boy" },
+    { "name": "Petra", "gender": "girl" },
+    { "name": "Una", "gender": "girl" },
+    { "name": "Max", "gender": "boy" },
+    { "name": "Oskar", "gender": "boy" },
+    { "name": "Adam", "gender": "boy" },
+    { "name": "Emilie", "gender": "girl" },
+    { "name": "Carl", "gender": "boy" },
+    { "name": "Luca", "gender": "boy" },
+    { "name": "Nora", "gender": "girl" },
+    { "name": "Lou", "gender": "girl" },
+    { "name": "Freja", "gender": "girl" },
+    { "name": "Elisa", "gender": "girl" },
+    { "name": "Pelle", "gender": "boy" },
+    { "name": "Anna", "gender": "girl" },
+    { "name": "Eleonora", "gender": "girl" },
+    { "name": "Noah", "gender": "boy" }
+  ]
+}
