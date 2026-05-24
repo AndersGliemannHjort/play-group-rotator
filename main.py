@@ -15,7 +15,6 @@ import argparse
 from child_manager import ChildManager
 from group_optimizer import GroupOptimizer
 from output_formatter import OutputFormatter
-from html_report import generate_html_report
 
 
 def validate_input_files():
@@ -111,17 +110,9 @@ def main():
             optimizer,
         )
 
-        report_path = os.path.join(
-            "output", f"Report_{args.iterations}_{seq}.html"
-        )
-        generate_html_report(
-            children, new_iterations, report_path, past_count
-        )
-
         print(f"\nOutput:")
         print(f"  {groups_path}")
         print(f"  {summary_path}")
-        print(f"  {report_path}")
         print(
             f"\nTo use these results as input for the next run, copy"
             f"\n  {groups_path}"

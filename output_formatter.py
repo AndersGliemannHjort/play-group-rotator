@@ -60,8 +60,7 @@ class OutputFormatter:
             self._write_iterations(f, iterations, past_count)
             self._write_fairness_check(f, children, total)
             self._write_hosting(f, children, new_stats, past_count)
-            self._write_meeting_coverage(f, children, total)
-            self._write_frequent_pairings(f, children)
+            self._write_pair_matrices(f, children)
             self._write_recurring_groups(f, iterations)
             self._write_warnings(f, warnings)
 
@@ -79,6 +78,117 @@ class OutputFormatter:
             return None
         gaps = [s[i] - s[i - 1] - 1 for i in range(1, len(s))]
         return sum(gaps) / len(gaps)
+
+    @staticmethod
+    def _sorted_names(children):
+        return sorted(c.name for c in children)
+
+    @staticmethod
+    def _abbrev(name, width=4):
+        """Short column label; strip spaces, pad to fixed width."""
+        s = name.replace(" ", "")[:width]
+        return s.ljust(width)
+
+    @staticmethod
+    def _pair_counts(children):
+        counts = {}
+        for c in children:
+            for other, cnt in c.meetings.items():
+                pair = tuple(sorted([c.name, other]))
+                counts[pair] = cnt
+        return counts
+
+    @staticmethod
+    def _pair_iteration_lists(children):
+        iters = {}
+        for c in children:
+            for other, lst in c.meeting_iterations.items():
+                pair = tuple(sorted([c.name, other]))
+                if pair not in iters:
+                    iters[pair] = lst
+        return iters
+
+    def _write_lower_triangular_matrix(
+        self,
+        f,
+        title,
+        names,
+        value_at,
+        cell_width=4,
+        empty=".",
+        legend=None,
+    ):
+        """Print symmetric stats for row i, columns 0..i (lower triangle incl. diagonal)."""
+        n = len(names)
+        col_w = cell_width
+        label_w = max(len(n) for n in names) + 1
+
+        f.write(f"  {title}\n")
+        if legend:
+            f.write(f"  {legend}\n")
+        f.write("\n")
+
+        def fmt_cell(text):
+            return text[:col_w].rjust(col_w)
+
+        header = " " * label_w + " ".join(
+            fmt_cell(self._abbrev(names[j], col_w)) for j in range(n)
+        )
+        f.write(f"  {header.rstrip()}\n")
+
+        for i in range(n):
+            cells = []
+            for j in range(n):
+                if j > i:
+                    cells.append(fmt_cell(""))
+                elif j == i:
+                    cells.append(fmt_cell("-"))
+                else:
+                    val = value_at(names[i], names[j])
+                    if val is None:
+                        cells.append(fmt_cell(empty))
+                    elif isinstance(val, float):
+                        cells.append(fmt_cell(f"{val:.1f}"))
+                    else:
+                        cells.append(fmt_cell(str(val)))
+            row_label = names[i].ljust(label_w)
+            f.write(f"  {row_label} {' '.join(cells)}\n")
+        f.write("\n")
+
+    def _write_pair_matrices(self, f, children):
+        f.write(f"\u2501" * 50 + "\n")
+        f.write("PAIR STATISTICS (lower triangle, row \u2265 column)\n")
+        f.write(f"\u2501" * 50 + "\n\n")
+
+        names = self._sorted_names(children)
+        counts = self._pair_counts(children)
+        pair_iters = self._pair_iteration_lists(children)
+
+        def meeting_count(a, b):
+            return counts.get(tuple(sorted([a, b])), 0)
+
+        self._write_lower_triangular_matrix(
+            f,
+            "Meeting counts (times in same group)",
+            names,
+            meeting_count,
+            cell_width=4,
+            legend="Diagonal: \u2014. Read row child vs column child.",
+        )
+
+        def avg_gap(a, b):
+            iters = pair_iters.get(tuple(sorted([a, b])), [])
+            return self._avg_gap_between_meetings(iters)
+
+        self._write_lower_triangular_matrix(
+            f,
+            "Avg iterations between meetings (2+ meetings only)",
+            names,
+            avg_gap,
+            cell_width=4,
+            empty=".",
+            legend="Diagonal: \u2014. Dot if pair met only once.",
+        )
 
     # ------------------------------------------------------------------
     # Private section writers
@@ -205,66 +315,6 @@ class OutputFormatter:
                 names = ", ".join(sorted(by_count[count]))
                 f.write(f"  {count}x: {names}\n")
         f.write("\n")
-
-    def _write_meeting_coverage(self, f, children, total):
-        f.write(f"\u2501" * 50 + "\n")
-        f.write(
-            f"MEETING COVERAGE "
-            f"(unique peers met, all {total} iterations)\n"
-        )
-        f.write(f"\u2501" * 50 + "\n\n")
-
-        max_peers = len(children) - 1
-        by_coverage = {}
-        for c in children:
-            cnt = len(c.meetings)
-            by_coverage.setdefault(cnt, []).append(c.name)
-
-        for cnt in sorted(by_coverage, reverse=True):
-            names = ", ".join(sorted(by_coverage[cnt]))
-            suffix = " (met everyone)" if cnt == max_peers else ""
-            f.write(f"  {cnt}/{max_peers}: {names}{suffix}\n")
-        f.write("\n")
-
-    def _write_frequent_pairings(self, f, children):
-        f.write(f"\u2501" * 50 + "\n")
-        f.write("MOST FREQUENT PAIRINGS (3+ meetings, all iterations)\n")
-        f.write(f"\u2501" * 50 + "\n\n")
-
-        pair_counts = {}
-        pair_iters = {}
-        for c in children:
-            for other, cnt in c.meetings.items():
-                pair = tuple(sorted([c.name, other]))
-                pair_counts[pair] = cnt
-            for other, iters in c.meeting_iterations.items():
-                pair = tuple(sorted([c.name, other]))
-                if pair not in pair_iters:
-                    pair_iters[pair] = iters
-
-        outliers = {p: c for p, c in pair_counts.items() if c >= 3}
-        if outliers:
-            by_freq = {}
-            for pair, cnt in outliers.items():
-                by_freq.setdefault(cnt, []).append(pair)
-            for cnt in sorted(by_freq, reverse=True):
-                pairs = sorted(by_freq[cnt])
-                parts = []
-                for p in pairs:
-                    iters = pair_iters.get(p, [])
-                    if len(iters) >= 2:
-                        g = self._avg_gap_between_meetings(iters)
-                        parts.append(
-                            f"{p[0]} & {p[1]} (avg {g:.1f} between)"
-                        )
-                    else:
-                        parts.append(f"{p[0]} & {p[1]}")
-                f.write(f"  {cnt}x: {', '.join(parts)}\n")
-            f.write("\n")
-        else:
-            f.write(
-                "  None \u2014 all pairs met at most 2 times \u2713\n\n"
-            )
 
     def _write_recurring_groups(self, f, iterations):
         triplet_iters = {}
