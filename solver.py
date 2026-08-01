@@ -23,16 +23,19 @@ class PlayGroupSolver:
       - 2 boys + 2 girls per group
       - Every child in exactly one group
       - Post-iteration hosting counts differ by at most 1
+      - A child never hosts again within MIN_HOST_GAP iterations of hosting
 
     Soft objectives (minimized):
       - Repeated pairings, quadratic in prior meeting count
       - Same-gender repeats weighted 2x (scarcer meeting opportunities)
       - Repeated triplets and quartets (quartet penalty stronger than triplet)
-      - Short hosting breaks (prefer 3+ iterations between hosting)
+      - Short hosting breaks (prefer PREFERRED_HOST_GAP+ iterations between hosting)
     """
 
     TRIPLET_WEIGHT = 8
     QUARTET_WEIGHT = 50
+    MIN_HOST_GAP = 2
+    PREFERRED_HOST_GAP = 3
 
     def solve(
         self,
@@ -108,6 +111,15 @@ class PlayGroupSolver:
                 model.Add(is_host[i] - is_host[j] <= 1 - d)
                 model.Add(is_host[j] - is_host[i] <= 1 + d)
 
+        # Hosting break: never let a child host again within MIN_HOST_GAP
+        # iterations of their last turn (hard floor; the soft penalty below
+        # still nudges toward the fuller PREFERRED_HOST_GAP when feasible).
+        for i in range(n):
+            if children[i].hosting_iterations:
+                gap = iteration_num - max(children[i].hosting_iterations) - 1
+                if gap < self.MIN_HOST_GAP:
+                    model.Add(is_host[i] == 0)
+
         # Symmetry breaking: groups are interchangeable, so fix child 0's label
         model.Add(x[0, 0] == 1)
 
@@ -180,12 +192,13 @@ class PlayGroupSolver:
             w = self.QUARTET_WEIGHT * (cnt * cnt + recency * recency)
             cost.append(w * u)
 
-        # Hosting break penalty: discourage hosting again soon
+        # Hosting break penalty: nudge toward PREFERRED_HOST_GAP even though
+        # only MIN_HOST_GAP is hard-enforced above.
         for i in range(n):
             if children[i].hosting_iterations:
                 gap = iteration_num - max(children[i].hosting_iterations) - 1
-                if gap < 3:
-                    cost.append((3 - gap) ** 2 * is_host[i])
+                if gap < self.PREFERRED_HOST_GAP:
+                    cost.append((self.PREFERRED_HOST_GAP - gap) ** 2 * is_host[i])
 
         if cost:
             model.Minimize(sum(cost))

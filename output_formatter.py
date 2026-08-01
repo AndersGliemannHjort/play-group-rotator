@@ -58,7 +58,7 @@ class OutputFormatter:
         with open(filepath, "w", encoding="utf-8") as f:
             self._write_header(f, children, iterations, past_count, total)
             self._write_iterations(f, iterations, past_count)
-            self._write_fairness_check(f, children, total)
+            self._write_fairness_check(f, children, total, past_count)
             self._write_hosting(f, children, new_stats, past_count)
             self._write_pair_matrices(f, children)
             self._write_recurring_groups(f, iterations)
@@ -69,15 +69,6 @@ class OutputFormatter:
     # ------------------------------------------------------------------
     # Helpers
     # ------------------------------------------------------------------
-
-    @staticmethod
-    def _avg_gap_between_meetings(iters):
-        """Mean iterations between consecutive meetings (same pair)."""
-        s = sorted(iters)
-        if len(s) < 2:
-            return None
-        gaps = [s[i] - s[i - 1] - 1 for i in range(1, len(s))]
-        return sum(gaps) / len(gaps)
 
     @staticmethod
     def _sorted_names(children):
@@ -97,16 +88,6 @@ class OutputFormatter:
                 pair = tuple(sorted([c.name, other]))
                 counts[pair] = cnt
         return counts
-
-    @staticmethod
-    def _pair_iteration_lists(children):
-        iters = {}
-        for c in children:
-            for other, lst in c.meeting_iterations.items():
-                pair = tuple(sorted([c.name, other]))
-                if pair not in iters:
-                    iters[pair] = lst
-        return iters
 
     def _write_lower_triangular_matrix(
         self,
@@ -162,7 +143,6 @@ class OutputFormatter:
 
         names = self._sorted_names(children)
         counts = self._pair_counts(children)
-        pair_iters = self._pair_iteration_lists(children)
 
         def meeting_count(a, b):
             return counts.get(tuple(sorted([a, b])), 0)
@@ -174,20 +154,6 @@ class OutputFormatter:
             meeting_count,
             cell_width=4,
             legend="Diagonal: \u2014. Read row child vs column child.",
-        )
-
-        def avg_gap(a, b):
-            iters = pair_iters.get(tuple(sorted([a, b])), [])
-            return self._avg_gap_between_meetings(iters)
-
-        self._write_lower_triangular_matrix(
-            f,
-            "Avg iterations between meetings (2+ meetings only)",
-            names,
-            avg_gap,
-            cell_width=4,
-            empty=".",
-            legend="Diagonal: \u2014. Dot if pair met only once.",
         )
 
     # ------------------------------------------------------------------
@@ -228,9 +194,62 @@ class OutputFormatter:
                 f.write(line + "\n")
             f.write("\n")
 
-    def _write_fairness_check(self, f, children, total):
+    @staticmethod
+    def _hosting_spacing_stats(children, min_iteration=None):
+        """Mean gap (per child, averaged) and shortest gap between a child's
+        hosting turns. If min_iteration is set, only counts gaps whose later
+        hosting is at or after it (i.e. gaps a new batch could have caused).
+        """
+        per_child_means = []
+        min_gap, min_gap_child = None, None
+        for c in children:
+            hi = sorted(c.hosting_iterations)
+            gaps = []
+            for a, b in zip(hi, hi[1:]):
+                if min_iteration is not None and b < min_iteration:
+                    continue
+                gaps.append(b - a - 1)
+            if gaps:
+                per_child_means.append(sum(gaps) / len(gaps))
+                local_min = min(gaps)
+                if min_gap is None or local_min < min_gap:
+                    min_gap, min_gap_child = local_min, c.name
+        mean = sum(per_child_means) / len(per_child_means) if per_child_means else None
+        return mean, min_gap, min_gap_child
+
+    @staticmethod
+    def _meeting_spacing_stats(children, min_iteration=None):
+        """Mean gap between consecutive meetings, averaged over pairs with
+        2+ qualifying meetings. If min_iteration is set, only counts gaps
+        whose later meeting is at or after it.
+        """
+        pair_means = []
+        seen_pairs = set()
+        for c in children:
+            for other, iters in c.meeting_iterations.items():
+                pair = tuple(sorted([c.name, other]))
+                if pair in seen_pairs:
+                    continue
+                seen_pairs.add(pair)
+                s = sorted(iters)
+                gaps = [
+                    b - a - 1
+                    for a, b in zip(s, s[1:])
+                    if min_iteration is None or b >= min_iteration
+                ]
+                if gaps:
+                    pair_means.append(sum(gaps) / len(gaps))
+        return sum(pair_means) / len(pair_means) if pair_means else None
+
+    def _write_fairness_check(self, f, children, total, past_count=0):
+        split = past_count > 0
+        new_from = past_count + 1
+
         f.write(f"\u2501" * 50 + "\n")
-        f.write(f"FAIRNESS CHECK (all {total} iterations)\n")
+        if split:
+            f.write("FAIRNESS CHECK (new iterations / all-time total)\n")
+        else:
+            f.write(f"FAIRNESS CHECK (all {total} iterations)\n")
         f.write(f"\u2501" * 50 + "\n\n")
 
         f.write(f"  Gender balance      All groups: 2B + 2G \u2713\n")
@@ -239,18 +258,78 @@ class OutputFormatter:
         lo, hi = min(counts), max(counts)
         gap = hi - lo
         mark = "\u2713" if gap <= 1 else "\u26A0"
-        f.write(
-            f"  Hosting fairness    "
-            f"Range: {lo}\u2013{hi} per child (gap: {gap}) {mark}\n"
-        )
+        if split:
+            new_counts = [
+                sum(1 for it in c.hosting_iterations if it >= new_from)
+                for c in children
+            ]
+            n_lo, n_hi = min(new_counts), max(new_counts)
+            f.write(
+                f"  Hosting fairness    "
+                f"New: {n_lo}\u2013{n_hi} | "
+                f"All-time: {lo}\u2013{hi} (gap: {gap}) {mark}\n"
+            )
+        else:
+            f.write(
+                f"  Hosting fairness    "
+                f"Range: {lo}\u2013{hi} per child (gap: {gap}) {mark}\n"
+            )
+
+        all_mean, all_min_gap, all_min_child = self._hosting_spacing_stats(children)
+        if all_mean is not None:
+            mark = "\u2713" if (all_min_gap is None or all_min_gap >= 3) else "\u26A0"
+            if split:
+                new_mean, new_min_gap, new_min_child = self._hosting_spacing_stats(
+                    children, min_iteration=new_from
+                )
+                new_part = (
+                    f"New: {new_mean:.1f} avg"
+                    + (f", shortest {new_min_gap} ({new_min_child})" if new_min_gap is not None else "")
+                    if new_mean is not None
+                    else "New: n/a"
+                )
+                mark = "\u2713" if (new_min_gap is None or new_min_gap >= 3) else "\u26A0"
+                f.write(
+                    f"  Hosting spacing     "
+                    f"{new_part} | All-time: {all_mean:.1f} avg"
+                    f"{f', shortest {all_min_gap} ({all_min_child})' if all_min_gap is not None else ''} "
+                    f"{mark}\n"
+                )
+            else:
+                shortest = (
+                    f", shortest: {all_min_gap} ({all_min_child})"
+                    if all_min_gap is not None
+                    else ""
+                )
+                f.write(
+                    f"  Hosting spacing     "
+                    f"Mean over children (2+ hostings): {all_mean:.1f} "
+                    f"iterations between{shortest} {mark}\n"
+                )
 
         coverage = [len(c.meetings) for c in children]
         c_lo, c_hi = min(coverage), max(coverage)
         max_peers = len(children) - 1
-        f.write(
-            f"  Meeting coverage    "
-            f"Each child met {c_lo}\u2013{c_hi} of {max_peers} peers\n"
-        )
+        if split:
+            new_coverage = [
+                sum(
+                    1
+                    for iters in c.meeting_iterations.values()
+                    if any(it >= new_from for it in iters)
+                )
+                for c in children
+            ]
+            nc_lo, nc_hi = min(new_coverage), max(new_coverage)
+            f.write(
+                f"  Meeting coverage    "
+                f"New: {nc_lo}\u2013{nc_hi} peers | "
+                f"All-time: {c_lo}\u2013{c_hi} of {max_peers} peers\n"
+            )
+        else:
+            f.write(
+                f"  Meeting coverage    "
+                f"Each child met {c_lo}\u2013{c_hi} of {max_peers} peers\n"
+            )
 
         max_m, max_pair = 0, None
         for c in children:
@@ -259,30 +338,47 @@ class OutputFormatter:
                     max_m = cnt
                     max_pair = (c.name, other)
         if max_pair:
-            f.write(
-                f"  Most repeated pair  "
-                f"{max_m} meetings ({max_pair[0]} & {max_pair[1]})\n"
-            )
+            if split:
+                new_max_m, new_max_pair = 0, None
+                for c in children:
+                    for other, iters in c.meeting_iterations.items():
+                        cnt = sum(1 for it in iters if it >= new_from)
+                        if cnt > new_max_m:
+                            new_max_m, new_max_pair = cnt, (c.name, other)
+                new_part = (
+                    f"{new_max_m} meetings ({new_max_pair[0]} & {new_max_pair[1]})"
+                    if new_max_pair
+                    else "none"
+                )
+                f.write(
+                    f"  Most repeated pair  "
+                    f"New: {new_part} | "
+                    f"All-time: {max_m} meetings ({max_pair[0]} & {max_pair[1]})\n"
+                )
+            else:
+                f.write(
+                    f"  Most repeated pair  "
+                    f"{max_m} meetings ({max_pair[0]} & {max_pair[1]})\n"
+                )
 
-        pair_avgs = []
-        seen_pairs = set()
-        for c in children:
-            for other, iters in c.meeting_iterations.items():
-                pair = tuple(sorted([c.name, other]))
-                if pair in seen_pairs or len(iters) < 2:
-                    continue
-                seen_pairs.add(pair)
-                g = self._avg_gap_between_meetings(iters)
-                if g is not None:
-                    pair_avgs.append(g)
-
-        if pair_avgs:
-            mean_spacing = sum(pair_avgs) / len(pair_avgs)
-            f.write(
-                f"  Meeting spacing     "
-                f"Mean over pairs (2+ meetings): "
-                f"{mean_spacing:.1f} iterations between\n"
-            )
+        all_spacing = self._meeting_spacing_stats(children)
+        if all_spacing is not None:
+            if split:
+                new_spacing = self._meeting_spacing_stats(
+                    children, min_iteration=new_from
+                )
+                new_part = f"{new_spacing:.1f} avg" if new_spacing is not None else "n/a"
+                f.write(
+                    f"  Meeting spacing     "
+                    f"New: {new_part} | "
+                    f"All-time: {all_spacing:.1f} iterations between\n"
+                )
+            else:
+                f.write(
+                    f"  Meeting spacing     "
+                    f"Mean over pairs (2+ meetings): "
+                    f"{all_spacing:.1f} iterations between\n"
+                )
 
         f.write("\n")
 
